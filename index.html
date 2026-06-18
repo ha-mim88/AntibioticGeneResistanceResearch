@@ -1,0 +1,2196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biomedical Entity Curation & Extraction Explorer</title>
+    <!-- Tailwind CSS for modern responsive utility design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js for beautiful interactive analytics charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SheetJS for local Excel (.xlsx) file binary parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Mermaid.js for rendering flowcharts -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <!-- SVG-Pan-Zoom for interactive diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.6.1/dist/svg-pan-zoom.min.js"></script>
+    <!-- FontAwesome for medical, chemistry, and genetics icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <meta name="author" content="Md. Thoukir Hasan Ha-Mim">
+    <meta name="contact" content="ha-mim88@outlook.com, +8801790512481">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+
+        /* Custom scrollbars for scrollable list containers */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+    <header
+        class="bg-slate-900 text-white shadow-md sticky top-0 z-50 px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-800">
+        <div class="flex items-center gap-3">
+            <div class="p-2.5 bg-indigo-600 rounded-lg shadow-inner flex items-center justify-center">
+                <i class="fa-solid fa-dna text-xl text-white animate-pulse"></i>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold tracking-tight">ARG Research: Biomedical Entity Curation & Discovery (Human
+                    Verification Ongoing)</h1>
+                <p class="text-xs text-slate-400">Validate, analyze, and compare AI Extracted and Curated Data</p>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 text-xs">
+            <div id="status-combined"
+                class="px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                <span>Combined: Connecting...</span>
+            </div>
+            <div id="status-curated"
+                class="px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                <span>Curations: 0/4 Loaded</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Pipeline Flowchart Buttons Bar -->
+    <div class="flex flex-wrap gap-2 px-6 py-2 bg-slate-100 border-b border-slate-200">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest self-center mr-2">Pipeline
+            Flowcharts:</span>
+        <button onclick="showMermaidModal('selection and data mining')"
+            class="text-xs font-semibold text-rose-600 hover:text-rose-800 transition flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-rose-100 shadow-sm">
+            <i class="fa-solid fa-magnifying-glass"></i> Selection & Data Mining
+        </button>
+        <button onclick="showMermaidModal('data extraction')"
+            class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-indigo-100 shadow-sm">
+            <i class="fa-solid fa-gears"></i> Data Extraction
+        </button>
+        <button onclick="showMermaidModal('extracted data post processing and curation')"
+            class="text-xs font-semibold text-emerald-600 hover:text-emerald-800 transition flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-emerald-100 shadow-sm">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Post-Processing & Curation
+        </button>
+        <button onclick="showMermaidModal('data compilation')"
+            class="text-xs font-semibold text-amber-600 hover:text-amber-800 transition flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-amber-100 shadow-sm">
+            <i class="fa-solid fa-layer-group"></i> Data Compilation
+        </button>
+    </div>
+
+    <!-- App Layout Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
+
+        <section id="upload-panel" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
+            <div class="flex items-start gap-4">
+                <div class="p-3 bg-indigo-50 text-indigo-600 rounded-xl">
+                    <i class="fa-solid fa-cloud-arrow-up text-2xl"></i>
+                </div>
+                <div class="space-y-1">
+                    <h2 class="text-base font-semibold text-slate-800">Local Environment File Fallback Upload</h2>
+                    <p class="text-xs text-slate-500">Auto-load couldn't resolve the files directly (typically due to
+                        local browser CORS limitations on <code
+                            class="bg-slate-100 px-1 py-0.5 rounded text-xs">file://</code> protocol). Drop or load your
+                        Excel Sheets (<code class="text-xs text-slate-700 font-semibold">.xlsx</code>) below to
+                        instantly launch the suite.</p>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2">
+                <div
+                    class="p-4 border-2 border-dashed border-slate-200 hover:border-indigo-400 rounded-xl bg-slate-50/50 hover:bg-white transition relative flex flex-col items-center justify-center text-center cursor-pointer">
+                    <input type="file" id="upload-combined" class="absolute inset-0 opacity-0 cursor-pointer"
+                        accept=".xlsx,.xls">
+                    <i class="fa-solid fa-file-excel text-slate-400 text-lg mb-1" id="icon-combined"></i>
+                    <span class="text-xs font-semibold text-slate-700 block">Combined Data</span>
+                    <span class="text-[10px] text-slate-400 block mt-0.5" id="label-combined">Choose xlsx file</span>
+                </div>
+                <div
+                    class="p-4 border-2 border-dashed border-slate-200 hover:border-indigo-400 rounded-xl bg-slate-50/50 hover:bg-white transition relative flex flex-col items-center justify-center text-center cursor-pointer">
+                    <input type="file" id="upload-antibiotics" class="absolute inset-0 opacity-0 cursor-pointer"
+                        accept=".xlsx,.xls">
+                    <i class="fa-solid fa-capsules text-slate-400 text-lg mb-1" id="icon-antibiotics"></i>
+                    <span class="text-xs font-semibold text-slate-700 block">Antibiotics Curation</span>
+                    <span class="text-[10px] text-slate-400 block mt-0.5" id="label-antibiotics">Choose xlsx file</span>
+                </div>
+                <div
+                    class="p-4 border-2 border-dashed border-slate-200 hover:border-indigo-400 rounded-xl bg-slate-50/50 hover:bg-white transition relative flex flex-col items-center justify-center text-center cursor-pointer">
+                    <input type="file" id="upload-diseases" class="absolute inset-0 opacity-0 cursor-pointer"
+                        accept=".xlsx,.xls">
+                    <i class="fa-solid fa-heart-crack text-slate-400 text-lg mb-1" id="icon-diseases"></i>
+                    <span class="text-xs font-semibold text-slate-700 block">Diseases Curation</span>
+                    <span class="text-[10px] text-slate-400 block mt-0.5" id="label-diseases">Choose xlsx file</span>
+                </div>
+                <div
+                    class="p-4 border-2 border-dashed border-slate-200 hover:border-indigo-400 rounded-xl bg-slate-50/50 hover:bg-white transition relative flex flex-col items-center justify-center text-center cursor-pointer">
+                    <input type="file" id="upload-genes" class="absolute inset-0 opacity-0 cursor-pointer"
+                        accept=".xlsx,.xls">
+                    <i class="fa-solid fa-dna text-slate-400 text-lg mb-1" id="icon-genes"></i>
+                    <span class="text-xs font-semibold text-slate-700 block">Genes Curation</span>
+                    <span class="text-[10px] text-slate-400 block mt-0.5" id="label-genes">Choose xlsx file</span>
+                </div>
+                <div
+                    class="p-4 border-2 border-dashed border-slate-200 hover:border-indigo-400 rounded-xl bg-slate-50/50 hover:bg-white transition relative flex flex-col items-center justify-center text-center cursor-pointer">
+                    <input type="file" id="upload-pathogens" class="absolute inset-0 opacity-0 cursor-pointer"
+                        accept=".xlsx,.xls">
+                    <i class="fa-solid fa-bacteria text-slate-400 text-lg mb-1" id="icon-pathogens"></i>
+                    <span class="text-xs font-semibold text-slate-700 block">Pathogens Curation</span>
+                    <span class="text-[10px] text-slate-400 block mt-0.5" id="label-pathogens">Choose xlsx file</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="flex border-b border-slate-200 flex-wrap">
+            <button onclick="switchTab('analytics')" id="tab-btn-analytics"
+                class="px-5 py-3.5 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 transition flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie"></i> Overview
+            </button>
+            <button onclick="switchTab('curated')" id="tab-btn-curated"
+                class="px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-2">
+                <i class="fa-solid fa-book-bookmark"></i> Curated Dictionaries
+            </button>
+            <button onclick="switchTab('combined')" id="tab-btn-combined"
+                class="px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-2">
+                <i class="fa-solid fa-microscope"></i> Interactive Paper Inspector & Grid
+            </button>
+            <button onclick="switchTab('mapping')" id="tab-btn-mapping"
+                class="px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-2">
+                <i class="fa-solid fa-diagram-project"></i> Interactive Mapping Matrix
+            </button>
+            <button onclick="switchTab('explorer')" id="tab-btn-explorer"
+                class="px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-2">
+                <i class="fa-solid fa-network-wired"></i> 6-Col Entity Explorer
+            </button>
+        </div>
+
+        <!-- ================= ANALYTICS TAB CONTENT ================= -->
+        <div id="tab-content-analytics" class="space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div
+                    class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-2 flex flex-col justify-between">
+                    <div class="flex justify-between items-center text-slate-400">
+                        <span class="text-xs font-bold tracking-wider uppercase text-slate-400">Total Indexed
+                            Papers</span>
+                        <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><i
+                                class="fa-solid fa-file-lines"></i></div>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-extrabold" id="stat-total-papers">0</h3>
+                        <p class="text-xs text-slate-500 mt-1">Cross-analyzed with Golden Standard matrices</p>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-2 flex flex-col justify-between">
+                    <div class="flex justify-between items-center text-slate-400">
+                        <span class="text-xs font-bold tracking-wider uppercase text-slate-400">Curated Entities
+                            Map</span>
+                        <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg"><i class="fa-solid fa-tag"></i></div>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-extrabold" id="stat-total-curations">0</h3>
+                        <p class="text-xs text-slate-500 mt-1">Known high-confidence reference elements</p>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-2 flex flex-col justify-between">
+                    <div class="flex justify-between items-center text-slate-400">
+                        <span class="text-xs font-bold tracking-wider uppercase text-slate-400">Global Coverage</span>
+                        <div class="p-2 bg-purple-50 text-purple-600 rounded-lg"><i class="fa-solid fa-globe"></i></div>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-extrabold" id="stat-total-countries">0</h3>
+                        <p class="text-xs text-slate-500 mt-1">Sovereign geographic sources identified</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4 lg:col-span-2">
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-sm">Geographical Demographics of AMR & Gut Studies</h4>
+                        <p class="text-xs text-slate-400">Most represented research nodes identified across publications
+                        </p>
+                    </div>
+                    <div class="h-64 relative">
+                        <canvas id="chart-geography"></canvas>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-sm">Distribution of Mapped Entity Categories</h4>
+                        <p class="text-xs text-slate-400">Reference density across curated classes</p>
+                    </div>
+                    <div class="h-64 relative flex items-center justify-center">
+                        <canvas id="chart-entities"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Download Hub layout -->
+            <div
+                class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4 flex flex-col justify-between">
+                <div>
+                    <h4 class="font-bold text-slate-800 text-sm">Download Central Hub</h4>
+                    <p class="text-xs text-slate-400">Download clean, high-confidence structured assets directly</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-5 gap-4 my-2">
+                    <button onclick="downloadActiveSheet('combined')"
+                        class="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:border-indigo-400 bg-slate-50 hover:bg-white text-left transition group">
+                        <div>
+                            <h5 class="text-xs font-bold text-slate-700">Combined Extracted Data</h5>
+                            <span class="text-[10px] text-slate-400 block mt-0.5">Excel Sheet (.xlsx)</span>
+                        </div>
+                        <div
+                            class="p-2 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-lg transition">
+                            <i class="fa-solid fa-download"></i>
+                        </div>
+                    </button>
+                    <button onclick="downloadActiveSheet('antibiotics')"
+                        class="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:border-indigo-400 bg-slate-50 hover:bg-white text-left transition group">
+                        <div>
+                            <h5 class="text-xs font-bold text-slate-700">Antibiotics Curation Sheet</h5>
+                            <span class="text-[10px] text-slate-400 block mt-0.5">Chemical/Antibiotic Map</span>
+                        </div>
+                        <div
+                            class="p-2 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-lg transition">
+                            <i class="fa-solid fa-download"></i>
+                        </div>
+                    </button>
+                    <button onclick="downloadActiveSheet('diseases')"
+                        class="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:border-indigo-400 bg-slate-50 hover:bg-white text-left transition group">
+                        <div>
+                            <h5 class="text-xs font-bold text-slate-700">Diseases Curation Sheet</h5>
+                            <span class="text-[10px] text-slate-400 block mt-0.5">Disease Vocabulary Map</span>
+                        </div>
+                        <div
+                            class="p-2 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-lg transition">
+                            <i class="fa-solid fa-download"></i>
+                        </div>
+                    </button>
+                    <button onclick="downloadActiveSheet('genes')"
+                        class="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:border-indigo-400 bg-slate-50 hover:bg-white text-left transition group">
+                        <div>
+                            <h5 class="text-xs font-bold text-slate-700">Genes Curation Sheet</h5>
+                            <span class="text-[10px] text-slate-400 block mt-0.5">Microbiome Genetic Map</span>
+                        </div>
+                        <div
+                            class="p-2 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-lg transition">
+                            <i class="fa-solid fa-download"></i>
+                        </div>
+                    </button>
+                    <button onclick="downloadActiveSheet('pathogens')"
+                        class="flex items-center justify-between p-4 rounded-xl border border-slate-200 hover:border-indigo-400 bg-slate-50 hover:bg-white text-left transition group">
+                        <div>
+                            <h5 class="text-xs font-bold text-slate-700">Pathogens Curation Sheet</h5>
+                            <span class="text-[10px] text-slate-400 block mt-0.5">Taxonomy Reference Map</span>
+                        </div>
+                        <div
+                            class="p-2 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-lg transition">
+                            <i class="fa-solid fa-download"></i>
+                        </div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= CURATED TAB CONTENT ================= -->
+        <div id="tab-content-curated" class="hidden space-y-6">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-base">Golden Curation Vocabulary Explorer</h4>
+                        <p class="text-xs text-slate-400">Explore mappings between raw uncurated extracted entities and
+                            standardized entities.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <select id="curated-sheet-selector" onchange="loadSelectedCuratedSheet()"
+                            class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-indigo-500">
+                            <option value="antibiotics">Chemicals & Antibiotics Mapping</option>
+                            <option value="diseases">Diseases Reference Map</option>
+                            <option value="genes">Genes Reference Map</option>
+                            <option value="pathogens">Pathogens Taxonomy Map</option>
+                        </select>
+                        <select id="curated-value-filter" onchange="filterCuratedTable()"
+                            class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-indigo-500">
+                            <option value="all">All Mappings</option>
+                            <option value="populated">Has Curated Value</option>
+                            <option value="empty">Empty / Unmapped Curation</option>
+                        </select>
+                        <button onclick="downloadActiveCuratedSheet()"
+                            class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold flex items-center gap-2 transition shadow-sm">
+                            <i class="fa-solid fa-file-export"></i> Export Active Sheet
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Searching, Filters and Grid Metrics -->
+                <div class="flex flex-col sm:flex-row items-center gap-3 py-2 border-t border-slate-100">
+                    <div class="relative flex-1 w-full">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                        <input type="text" id="search-curated" oninput="filterCuratedTable()"
+                            placeholder="Search through original or curated terms..."
+                            class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <!-- Custom Interactive Table -->
+                <div class="overflow-x-auto border border-slate-100 rounded-lg">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead class="bg-slate-50 text-slate-500 border-b border-slate-100 uppercase font-semibold">
+                            <tr>
+                                <th class="p-4 w-1/2">Original Extract Target (AI output)</th>
+                                <th class="p-4 w-1/2">Curated Standard Entity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="curated-table-body" class="divide-y divide-slate-100 font-medium">
+                            <tr>
+                                <td colspan="2" class="p-8 text-center text-slate-400">
+                                    <i class="fa-solid fa-circle-notch animate-spin text-lg mb-2 block"></i> Loading
+                                    curated indices...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div
+                    class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400 pt-2 border-t border-slate-100">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span id="curated-pagination-info">Showing 0 - 0 of 0 mappings</span>
+                        <div class="flex items-center gap-1.5">
+                            <label for="curated-items-per-page"
+                                class="text-[10px] text-slate-400 font-semibold uppercase">Show:</label>
+                            <select id="curated-items-per-page" onchange="changeCuratedPageSize(this.value)"
+                                class="bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-indigo-500">
+                                <option value="5">5</option>
+                                <option value="10" selected>10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <label for="curated-goto-page" class="text-[10px] text-slate-400 font-semibold uppercase">Go
+                                to page:</label>
+                            <input type="number" id="curated-goto-page" min="1" oninput="jumpToCuratedPage(this.value)"
+                                class="w-12 bg-slate-50 border border-slate-200 rounded px-1 text-center text-[11px] focus:outline-none focus:border-indigo-500">
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="changeCuratedPage(-1)"
+                            class="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600 transition"><i
+                                class="fa-solid fa-chevron-left"></i></button>
+                        <button onclick="changeCuratedPage(1)"
+                            class="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600 transition"><i
+                                class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= COMBINED PAPER VIEW TAB CONTENT ================= -->
+        <div id="tab-content-combined" class="hidden space-y-6">
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+
+                <!-- Left Side Panel: Browseable Data Registry Grid -->
+                <div class="xl:col-span-7 bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-base">Paper Database Registry</h4>
+                            <p class="text-xs text-slate-400">Complete browseable index of the combined publication
+                                cohort.</p>
+                        </div>
+                        <span id="filtered-papers-count"
+                            class="px-2.5 py-1 bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold rounded-lg">0
+                            Papers</span>
+                    </div>
+
+                    <!-- Search and filters -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-3 border-t border-slate-100 text-xs">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                            <input type="text" id="paper-search" oninput="filterCombinedPapers()"
+                                placeholder="Search PMID, PMCID, Title..."
+                                class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <select id="paper-filter-country" onchange="filterCombinedPapers()"
+                                class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-indigo-500">
+                                <option value="">All Countries</option>
+                            </select>
+                        </div>
+                        <div>
+                            <select id="paper-filter-discrepancy" onchange="filterCombinedPapers()"
+                                class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-indigo-500">
+                                <option value="">All Alignments</option>
+                                <option value="match">Perfect Agreement</option>
+                                <option value="mismatch">Has Alignment Drift</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Compact Spreadsheet Grid -->
+                    <div class="overflow-x-auto border border-slate-100 rounded-lg">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead
+                                class="bg-slate-50 text-slate-500 border-b border-slate-100 uppercase text-[10px] font-bold">
+                                <tr>
+                                    <th class="p-3">Paper Identifier (PMCID_PMID)</th>
+                                    <th class="p-3">Title & Authors</th>
+                                    <th class="p-3 text-center">Country</th>
+                                    <th class="p-3 text-center">Entities (C / E)</th>
+                                    <th class="p-3 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="combined-grid-body" class="divide-y divide-slate-100 font-medium">
+                                <tr>
+                                    <td colspan="5" class="p-8 text-center text-slate-400">
+                                        <i
+                                            class="fa-solid fa-circle-notch animate-spin text-lg mb-2 block text-indigo-500"></i>
+                                        Parsing Excel datasets...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div
+                        class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400 pt-1">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span id="papers-pagination-info">Showing 0 of 0 papers</span>
+                            <div class="flex items-center gap-1.5">
+                                <label for="papers-items-per-page"
+                                    class="text-[10px] text-slate-400 font-semibold uppercase">Show:</label>
+                                <select id="papers-items-per-page" onchange="changePapersPageSize(this.value)"
+                                    class="bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-indigo-500">
+                                    <option value="4">4</option>
+                                    <option value="8" selected>8</option>
+                                    <option value="15">15</option>
+                                    <option value="30">30</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <label for="papers-goto-page"
+                                    class="text-[10px] text-slate-400 font-semibold uppercase">Go to page:</label>
+                                <input type="number" id="papers-goto-page" min="1"
+                                    oninput="jumpToPapersPage(this.value)"
+                                    class="w-12 bg-slate-50 border border-slate-200 rounded px-1 text-center text-[11px] focus:outline-none focus:border-indigo-500">
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="changePapersPage(-1)"
+                                class="px-2 py-1 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600 transition text-[10px]"><i
+                                    class="fa-solid fa-chevron-left"></i> Prev</button>
+                            <button onclick="changePapersPage(1)"
+                                class="px-2 py-1 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600 transition text-[10px]">Next
+                                <i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Side Panel: Interactive Validation Inspector Canvas -->
+                <div class="xl:col-span-5 bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
+                    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-base">Curation Audit Inspector</h4>
+                            <p class="text-xs text-slate-400">Click on any registry item to analyze matching metrics.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Placeholder -->
+                    <div id="inspector-placeholder" class="py-16 text-center text-slate-400 space-y-2">
+                        <i class="fa-solid fa-square-poll-vertical text-4xl text-slate-300"></i>
+                        <p class="text-xs font-semibold text-slate-500">No active item selected</p>
+                        <p class="text-[10px] text-slate-400 max-w-xs mx-auto">Select any scientific paper inside the
+                            registry grid on the left to start high-precision audit comparison.</p>
+                    </div>
+
+                    <!-- Active Content Card -->
+                    <div id="inspector-active-content" class="hidden space-y-4">
+                        <div class="p-3 bg-slate-50 rounded-lg border border-slate-100 space-y-1.5 relative">
+                            <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400"
+                                id="inspect-pmcid-pmid">PMID: -</span>
+                            <button id="inspect-expand-btn"
+                                class="absolute top-2.5 right-2.5 px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-[10px] font-bold flex items-center gap-1 shadow-sm transition">
+                                <i class="fa-solid fa-expand"></i> Full Text
+                            </button>
+                            <h5 class="text-sm font-bold text-slate-800 leading-tight pr-16" id="inspect-title">-</h5>
+                            <p class="text-[10px] text-slate-500" id="inspect-authors">-</p>
+                        </div>
+
+                        <!-- Abstract block -->
+                        <div class="space-y-1">
+                            <span class="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Abstract
+                                Text</span>
+                            <p id="inspect-abstract"
+                                class="text-xs text-slate-600 leading-relaxed text-justify line-clamp-3 hover:line-clamp-none transition-all cursor-pointer border border-dashed border-slate-150 p-2 rounded bg-slate-50/20"
+                                title="Click to expand abstract text"></p>
+                        </div>
+
+                        <!-- Side by side matrices (Curated vs Extracted column splits) -->
+                        <div class="space-y-4 pt-2">
+                            <!-- Genes matrix -->
+                            <div class="space-y-1.5">
+                                <span class="font-bold text-emerald-800 uppercase tracking-wider text-[10px]"><i
+                                        class="fa-solid fa-dna mr-1"></i> Genes Map</span>
+                                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                                    <div class="p-2.5 bg-indigo-50/30 border border-indigo-100 rounded-lg min-h-[48px]">
+                                        <span
+                                            class="text-[8px] uppercase font-bold text-indigo-600 block mb-1">Extracted</span>
+                                        <div id="inspect-extracted-genes" class="flex flex-wrap gap-1"></div>
+                                    </div>
+                                    <div
+                                        class="p-2.5 bg-emerald-50/30 border border-emerald-100 rounded-lg min-h-[48px]">
+                                        <span
+                                            class="text-[8px] uppercase font-bold text-emerald-600 block mb-1">Curated</span>
+                                        <div id="inspect-curated-genes" class="flex flex-wrap gap-1"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Diseases matrix -->
+                            <div class="space-y-1.5">
+                                <span class="font-bold text-rose-800 uppercase tracking-wider text-[10px]"><i
+                                        class="fa-solid fa-heart-crack mr-1"></i> Diseases Map</span>
+                                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                                    <div class="p-2.5 bg-indigo-50/30 border border-indigo-100 rounded-lg min-h-[48px]">
+                                        <span
+                                            class="text-[8px] uppercase font-bold text-indigo-600 block mb-1">Extracted</span>
+                                        <div id="inspect-extracted-diseases" class="flex flex-wrap gap-1"></div>
+                                    </div>
+                                    <div
+                                        class="p-2.5 bg-emerald-50/30 border border-emerald-100 rounded-lg min-h-[48px]">
+                                        <span
+                                            class="text-[8px] uppercase font-bold text-emerald-600 block mb-1">Curated</span>
+                                        <div id="inspect-curated-diseases" class="flex flex-wrap gap-1"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Pathogens matrix -->
+                            <div class="space-y-1.5">
+                                <span class="font-bold text-blue-800 uppercase tracking-wider text-[10px]"><i
+                                        class="fa-solid fa-bacteria mr-1"></i> Pathogens Map</span>
+                                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                                    <div class="p-2.5 bg-indigo-50/30 border border-indigo-100 rounded-lg min-h-[48px]">
+                                        <span
+                                            class="text-[8px] uppercase font-bold text-indigo-600 block mb-1">Extracted</span>
+                                        <div id="inspect-extracted-pathogens" class="flex flex-wrap gap-1"></div>
+                                    </div>
+                                    <div
+                                        class="p-2.5 bg-emerald-50/30 border border-emerald-100 rounded-lg min-h-[48px]">
+                                        <span
+                                            class="text-[8px] uppercase font-bold text-emerald-600 block mb-1">Curated</span>
+                                        <div id="inspect-curated-pathogens" class="flex flex-wrap gap-1"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Antibiotics matrix -->
+                            <div class="space-y-1.5">
+                                <span class="font-bold text-amber-800 uppercase tracking-wider text-[10px]"><i
+                                        class="fa-solid fa-capsules mr-1"></i> Antibiotics Map</span>
+                                <div class="grid grid-cols-2 gap-2 text-[11px]">
+                                    <div class="p-2.5 bg-indigo-50/30 border border-indigo-100 rounded-lg min-h-[48px]">
+                                        <span
+                                            class="text-[8px] uppercase font-bold text-indigo-600 block mb-1">Extracted</span>
+                                        <div id="inspect-extracted-antibiotics" class="flex flex-wrap gap-1"></div>
+                                    </div>
+                                    <div
+                                        class="p-2.5 bg-emerald-50/30 border border-emerald-100 rounded-lg min-h-[48px]">
+                                        <span
+                                            class="text-[8px] uppercase font-bold text-emerald-600 block mb-1">Curated</span>
+                                        <div id="inspect-curated-antibiotics" class="flex flex-wrap gap-1"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Legend -->
+                        <div
+                            class="flex flex-wrap gap-3 text-[9px] text-slate-500 font-medium pt-2 border-t border-slate-100">
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded bg-indigo-500"></span> AI
+                                Extracted Entities</span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded bg-emerald-500"></span>
+                                Golden Standard Curated Entities</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ================= MAPPING TAB CONTENT ================= -->
+        <div id="tab-content-mapping" class="hidden space-y-6">
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
+
+                <!-- Left Column: Unique Tuples Association Registry -->
+                <div class="xl:col-span-8 bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-base">Associated Entity Pathway Index</h4>
+                        <p class="text-xs text-slate-400">Discover distinct co-occurrence patterns (Disease, Pathogen,
+                            Gene, Antibiotic) mapped inside the papers.</p>
+                    </div>
+
+                    <!-- Filter Bar for the 4 dimensions -->
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2 text-xs">
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 text-slate-400"><i
+                                    class="fa-solid fa-virus text-[10px]"></i></span>
+                            <input type="text" id="map-filter-disease" oninput="filterUniqueMappingMatrix()"
+                                placeholder="Filter Disease..."
+                                class="w-full pl-7 pr-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 text-slate-400"><i
+                                    class="fa-solid fa-bacteria text-[10px]"></i></span>
+                            <input type="text" id="map-filter-pathogen" oninput="filterUniqueMappingMatrix()"
+                                placeholder="Filter Pathogen..."
+                                class="w-full pl-7 pr-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 text-slate-400"><i
+                                    class="fa-solid fa-dna text-[10px]"></i></span>
+                            <input type="text" id="map-filter-gene" oninput="filterUniqueMappingMatrix()"
+                                placeholder="Filter Gene..."
+                                class="w-full pl-7 pr-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 text-slate-400"><i
+                                    class="fa-solid fa-capsules text-[10px]"></i></span>
+                            <input type="text" id="map-filter-antibiotic" oninput="filterUniqueMappingMatrix()"
+                                placeholder="Filter Antibiotic..."
+                                class="w-full pl-7 pr-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500">
+                        </div>
+                    </div>
+
+                    <!-- Unique Matrix Grid Table -->
+                    <div class="overflow-x-auto border border-slate-100 rounded-lg">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead
+                                class="bg-slate-50 text-slate-500 border-b border-slate-100 uppercase text-[9px] font-bold">
+                                <tr>
+                                    <th class="p-3">Disease Standard</th>
+                                    <th class="p-3">Pathogen Taxonomy</th>
+                                    <th class="p-3">Gene Family</th>
+                                    <th class="p-3">Chemical / Antibiotic</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mapping-grid-body" class="divide-y divide-slate-100 font-medium">
+                                <tr>
+                                    <td colspan="4" class="p-8 text-center text-slate-400">No pathways discovered yet.
+                                        Please load datasets.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div
+                        class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400 pt-1">
+                        <div class="flex flex-wrap items-center gap-3">
+                            <span id="mapping-pagination-info">Showing 0 of 0 pathways</span>
+                            <div class="flex items-center gap-1.5">
+                                <label for="mapping-items-per-page"
+                                    class="text-[10px] text-slate-400 font-semibold uppercase">Show:</label>
+                                <select id="mapping-items-per-page" onchange="changeMappingPageSize(this.value)"
+                                    class="bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-indigo-500">
+                                    <option value="5" selected>5</option>
+                                    <option value="10">10</option>
+                                    <option value="25">25</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <label for="mapping-goto-page"
+                                    class="text-[10px] text-slate-400 font-semibold uppercase">Go to page:</label>
+                                <input type="number" id="mapping-goto-page" min="1"
+                                    oninput="jumpToMappingPage(this.value)"
+                                    class="w-12 bg-slate-50 border border-slate-200 rounded px-1 text-center text-[11px] focus:outline-none focus:border-indigo-500">
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <button onclick="changeMappingPage(-1)"
+                                class="px-2 py-1 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600 transition text-[10px]"><i
+                                    class="fa-solid fa-chevron-left"></i> Prev</button>
+                            <button onclick="changeMappingPage(1)"
+                                class="px-2 py-1 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600 transition text-[10px]">Next
+                                <i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Associated Papers panel -->
+                <div class="xl:col-span-4 bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-base">Associated Research Cohort</h4>
+                        <p class="text-xs text-slate-400">Publications corresponding to the selected row pathway.</p>
+                    </div>
+
+                    <div id="mapping-papers-placeholder" class="py-16 text-center text-slate-400">
+                        <i class="fa-solid fa-diagram-nested text-4xl text-slate-200 mb-2 block"></i>
+                        <span class="text-xs">Select any pathway row on the left to show the research documents.</span>
+                    </div>
+
+                    <div id="mapping-papers-list" class="space-y-3 hidden max-h-[500px] overflow-y-auto pr-1"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ================= EXPLORER TAB CONTENT ================= -->
+        <div id="tab-content-explorer" class="hidden space-y-4">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
+                <div>
+                    <h4 class="font-bold text-slate-800 text-base">Six-Column Network Explorer</h4>
+                    <p class="text-xs text-slate-400">Click any unique item in the first 4 columns to query the
+                        database, pull associated papers, and view their validation status instantly.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-6 gap-3">
+
+                    <!-- Column 1: Unique Genes -->
+                    <div class="bg-slate-50/50 rounded-xl p-3 border border-slate-100 flex flex-col h-[400px]">
+                        <span class="font-bold text-emerald-800 text-[10px] uppercase block mb-1.5"><i
+                                class="fa-solid fa-dna mr-1"></i> Unique Genes</span>
+                        <input type="text" id="explorer-search-gene" oninput="filterExplorerLists('gene')"
+                            placeholder="Search..."
+                            class="w-full mb-2 px-2 py-1 border border-slate-200 rounded text-xs focus:outline-none focus:border-indigo-500">
+                        <div id="explorer-genes-list"
+                            class="flex-1 overflow-y-auto space-y-1 text-xs font-semibold pr-1"></div>
+                    </div>
+
+                    <!-- Column 2: Unique Pathogens -->
+                    <div class="bg-slate-50/50 rounded-xl p-3 border border-slate-100 flex flex-col h-[400px]">
+                        <span class="font-bold text-blue-800 text-[10px] uppercase block mb-1.5"><i
+                                class="fa-solid fa-bacteria mr-1"></i> Unique Pathogens</span>
+                        <input type="text" id="explorer-search-pathogen" oninput="filterExplorerLists('pathogen')"
+                            placeholder="Search..."
+                            class="w-full mb-2 px-2 py-1 border border-slate-200 rounded text-xs focus:outline-none focus:border-indigo-500">
+                        <div id="explorer-pathogens-list"
+                            class="flex-1 overflow-y-auto space-y-1 text-xs font-semibold pr-1"></div>
+                    </div>
+
+                    <!-- Column 3: Unique Diseases -->
+                    <div class="bg-slate-50/50 rounded-xl p-3 border border-slate-100 flex flex-col h-[400px]">
+                        <span class="font-bold text-rose-800 text-[10px] uppercase block mb-1.5"><i
+                                class="fa-solid fa-heart-crack mr-1"></i> Unique Diseases</span>
+                        <input type="text" id="explorer-search-disease" oninput="filterExplorerLists('disease')"
+                            placeholder="Search..."
+                            class="w-full mb-2 px-2 py-1 border border-slate-200 rounded text-xs focus:outline-none focus:border-indigo-500">
+                        <div id="explorer-diseases-list"
+                            class="flex-1 overflow-y-auto space-y-1 text-xs font-semibold pr-1"></div>
+                    </div>
+
+                    <!-- Column 4: Unique Antibiotics -->
+                    <div class="bg-slate-50/50 rounded-xl p-3 border border-slate-100 flex flex-col h-[400px]">
+                        <span class="font-bold text-amber-800 text-[10px] uppercase block mb-1.5"><i
+                                class="fa-solid fa-capsules mr-1"></i> Unique Antibiotics</span>
+                        <input type="text" id="explorer-search-antibiotic" oninput="filterExplorerLists('antibiotic')"
+                            placeholder="Search..."
+                            class="w-full mb-2 px-2 py-1 border border-slate-200 rounded text-xs focus:outline-none focus:border-indigo-500">
+                        <div id="explorer-antibiotics-list"
+                            class="flex-1 overflow-y-auto space-y-1 text-xs font-semibold pr-1"></div>
+                    </div>
+
+                    <!-- Column 5: Associated Papers -->
+                    <div class="bg-indigo-50/20 rounded-xl p-3 border border-indigo-100/50 flex flex-col h-[400px]">
+                        <span class="font-bold text-indigo-800 text-[10px] uppercase block mb-1.5"><i
+                                class="fa-solid fa-list-check mr-1"></i> Mapped Papers</span>
+                        <div id="explorer-papers-list" class="flex-1 overflow-y-auto space-y-2 text-xs pr-1">
+                            <span class="text-slate-400 italic block text-center mt-12 text-[10px]">Select an entity
+                                above to populate documents list.</span>
+                        </div>
+                    </div>
+
+                    <!-- Column 6: Paper Inspector Panel -->
+                    <div class="bg-white rounded-xl p-3 border border-slate-200 flex flex-col h-[400px]">
+                        <span class="font-bold text-slate-800 text-[10px] uppercase block mb-1.5"><i
+                                class="fa-solid fa-file-invoice mr-1"></i> Document View</span>
+                        <div id="explorer-paper-details" class="flex-1 overflow-y-auto space-y-3 text-xs pr-1">
+                            <span class="text-slate-400 italic block text-center mt-12 text-[10px]">Select any paper
+                                from Col 5 to inspect metadata and matrices.</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Detailed Full Text / PDF Viewer Modal Overlay -->
+    <div id="paper-modal"
+        class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 md:p-6">
+        <div
+            class="bg-white rounded-2xl max-w-6xl w-full h-[90vh] flex flex-col shadow-2xl border border-slate-200 overflow-hidden animate-fadeIn">
+            <!-- Modal Header -->
+            <div class="bg-slate-900 text-white px-6 py-4 flex items-center justify-between">
+                <div class="space-y-1 flex-1 pr-4">
+                    <span
+                        class="text-[10px] uppercase tracking-wider font-extrabold text-indigo-300 bg-indigo-950/60 px-2.5 py-1 rounded border border-indigo-900"
+                        id="modal-paper-id">NaN</span>
+                    <h3 class="text-base font-bold truncate mt-1.5" id="modal-title">Paper Details</h3>
+                </div>
+                <button onclick="closePaperModal()"
+                    class="text-slate-400 hover:text-white transition p-2 rounded-lg hover:bg-slate-800">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Modal Workspace Panel (Split Layout with Sidebar + Tabs) -->
+            <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
+                <!-- Sidebar Metadata Info -->
+                <div class="w-full md:w-80 bg-slate-50 border-r border-slate-200 p-5 overflow-y-auto space-y-5 text-xs">
+                    <div class="space-y-1">
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Authors</span>
+                        <p id="modal-authors" class="text-slate-800 font-semibold leading-relaxed"></p>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 border-t border-b border-slate-200 py-3">
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-slate-400 block">Country</span>
+                            <span id="modal-country" class="text-slate-800 font-bold"></span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-slate-400 block">Year</span>
+                            <span id="modal-year" class="text-slate-800 font-bold"></span>
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Affiliation Information</span>
+                        <p id="modal-affiliation" class="text-slate-600 leading-normal text-[11px]"></p>
+                    </div>
+                    <div class="space-y-1" id="modal-keywords-container">
+                        <span class="text-[10px] uppercase font-bold text-slate-400">Keywords</span>
+                        <div id="modal-keywords" class="flex flex-wrap gap-1 mt-1"></div>
+                    </div>
+                    <div class="space-y-1" id="modal-mesh-container">
+                        <span class="text-[10px] uppercase font-bold text-slate-400">MeSH Headings</span>
+                        <div id="modal-mesh" class="flex flex-wrap gap-1 mt-1"></div>
+                    </div>
+                </div>
+
+                <!-- Main Display with Reader/PDF Tabs -->
+                <div class="flex-1 flex flex-col overflow-hidden bg-white">
+                    <!-- Tab Selector Inside Modal -->
+                    <div class="flex bg-slate-100 border-b border-slate-200">
+                        <button onclick="switchModalTab('abstract')" id="modal-tab-abstract"
+                            class="px-5 py-3 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-file-text"></i> Abstract & Summary
+                        </button>
+                        <button onclick="switchModalTab('fulltext')" id="modal-tab-fulltext"
+                            class="px-5 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-book-open"></i> Full Text Article
+                        </button>
+                    </div>
+
+                    <!-- Tab Abstract Summary Content -->
+                    <div id="modal-content-abstract" class="flex-1 p-6 overflow-y-auto space-y-6">
+                        <div class="space-y-2">
+                            <h4 class="text-xs uppercase font-extrabold text-slate-400 tracking-wider">Abstract Text
+                            </h4>
+                            <p id="modal-abstract-text"
+                                class="text-xs text-slate-700 leading-relaxed text-justify bg-slate-50 p-4 rounded-xl border border-slate-200/60 font-medium">
+                            </p>
+                        </div>
+
+                        <!-- Side by side matrices replica -->
+                        <div class="space-y-4">
+                            <h4
+                                class="text-xs uppercase font-extrabold text-slate-800 tracking-wider flex items-center gap-1.5">
+                                <i class="fa-solid fa-tags text-indigo-500"></i> Entity Mapping Overview
+                            </h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="space-y-1.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200/60">
+                                    <span class="font-bold text-emerald-800 uppercase tracking-wider text-[10px]"><i
+                                            class="fa-solid fa-dna mr-1"></i> Genes Map</span>
+                                    <div id="modal-badges-genes" class="flex flex-wrap gap-1 pt-1.5"></div>
+                                </div>
+                                <div class="space-y-1.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200/60">
+                                    <span class="font-bold text-rose-800 uppercase tracking-wider text-[10px]"><i
+                                            class="fa-solid fa-heart-crack mr-1"></i> Diseases Map</span>
+                                    <div id="modal-badges-diseases" class="flex flex-wrap gap-1 pt-1.5"></div>
+                                </div>
+                                <div class="space-y-1.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200/60">
+                                    <span class="font-bold text-blue-800 uppercase tracking-wider text-[10px]"><i
+                                            class="fa-solid fa-bacteria mr-1"></i> Pathogens Map</span>
+                                    <div id="modal-badges-pathogens" class="flex flex-wrap gap-1 pt-1.5"></div>
+                                </div>
+                                <div class="space-y-1.5 p-3.5 bg-slate-50 rounded-xl border border-slate-200/60">
+                                    <span class="font-bold text-amber-800 uppercase tracking-wider text-[10px]"><i
+                                            class="fa-solid fa-capsules mr-1"></i> Antibiotics Map</span>
+                                    <div id="modal-badges-antibiotics" class="flex flex-wrap gap-1 pt-1.5"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab Full Text Content -->
+                    <div id="modal-content-fulltext" class="hidden flex-1 flex flex-col overflow-hidden relative">
+                        <!-- Loading Loader overlay inside modal -->
+                        <div id="fulltext-loader"
+                            class="absolute inset-0 bg-white/90 z-20 flex flex-col items-center justify-center text-xs text-slate-500 space-y-2">
+                            <i class="fa-solid fa-circle-notch animate-spin text-2xl text-indigo-600"></i>
+                            <span>Resolving Full Text Article files...</span>
+                        </div>
+
+                        <!-- Panel rendered dynamically -->
+                        <div id="fulltext-viewer" class="flex-1 p-6 overflow-y-auto space-y-4">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mermaid Flowchart Modal -->
+    <div id="mermaid-modal"
+        class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[150] flex items-center justify-center p-4">
+        <div
+            class="bg-white rounded-2xl max-w-[95vw] w-full h-[90vh] min-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-fadeIn">
+            <div class="bg-slate-800 text-white px-6 py-4 flex items-center justify-between">
+                <h3 class="text-sm font-bold" id="mermaid-modal-title">Workflow Diagram</h3>
+                <div class="flex items-center gap-4">
+                    <span class="text-[10px] text-slate-400 font-medium"><i class="fa-solid fa-mouse-pointer mr-1"></i>
+                        Scroll to Zoom | Drag to Pan</span>
+                    <button onclick="closeMermaidModal()"
+                        class="text-slate-400 hover:text-white transition p-2 rounded-lg hover:bg-slate-700">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="flex-1 overflow-hidden bg-white min-h-0" id="mermaid-container">
+                <!-- Mermaid graph will be rendered here -->
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center small text-slate-400 mt-12 mb-6">
+        <p class="text-[10px]">This web application is built for research purposes only. All data and content are
+            sourced from publicly available scientific literature and curated datasets.</p>
+        <p class="text-[10px]">Md. Thoukir Hasan Ha-Mim</p>
+        <p class="hidden text-[10px]">Email: <a href="mailto:ha-mim88@outlook.com">ha-mim88@outlook.com</a></p>
+        <p class="hidden text-[10px]">Phone: <a href="tel:+8801790512481">+8801790512481</a></p>
+    </footer>
+    <!-- ================= INTERACTIVE SCRIPTS ================= -->
+    <script>
+        let datasets = {
+            combined: [],
+            antibiotics: [],
+            diseases: [],
+            genes: [],
+            pathogens: []
+        };
+
+        // Cache for fulltext documents JSON to prevent repetitive large fetching
+        let fulltextArticlesCache = null;
+
+        // UI Pagination & Filtering state
+        let currentTab = 'analytics';
+        let curatedActiveSheet = 'antibiotics';
+        let curatedValueFilter = 'all';
+
+        let curatedPage = 1;
+        let curatedPageSize = 10;
+        let curatedSearchFilteredData = [];
+
+        let papersPage = 1;
+        let papersPageSize = 8;
+        let papersFilteredData = [];
+        let activeSelectedPaper = null;
+
+        // Unique Mapping Tuples matrix states
+        let uniqueMappingsData = [];
+        let uniqueMappingsFiltered = [];
+        let mappingPage = 1;
+        let mappingPageSize = 5;
+        let activeSelectedPathway = null;
+
+        // Explorer search filters
+        let explorerActiveEntities = {
+            type: '',
+            value: ''
+        };
+
+        // Graphic Elements References
+        let geoChart = null;
+        let entityChart = null;
+
+        // Auto Load Excel Assets Direct Maps
+        const fileUrls = {
+            combined: 'final_combined_extracted_data.xlsx',
+            antibiotics: 'final_antibiotics_curated.xlsx',
+            diseases: 'final_diseases_curated.xlsx',
+            genes: 'final_genes_curated.xlsx',
+            pathogens: 'final_pathogens_curated.xlsx'
+        };
+
+        // Run boot loops
+        window.addEventListener('DOMContentLoaded', () => {
+            initAutoLoading();
+            initManualUploadListeners();
+
+            // Add Esc Key Listener to close modal
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closePaperModal();
+            });
+        });
+
+        // Compute pmcid_pmid row keys dynamically
+        function sanitizeAndSetIdentifier(p) {
+            const pmcidPart = (p.pmcid && String(p.pmcid).trim() !== '' && String(p.pmcid).trim().toLowerCase() !== 'null' && String(p.pmcid).trim().toLowerCase() !== 'undefined' && String(p.pmcid).trim() !== 'N/A') ? String(p.pmcid).trim() : 'NaN';
+            const pmidPart = (p.pmid && String(p.pmid).trim() !== '' && String(p.pmid).trim().toLowerCase() !== 'null' && String(p.pmid).trim().toLowerCase() !== 'undefined' && String(p.pmid).trim() !== 'N/A') ? String(p.pmid).trim() : 'NaN';
+            p.pmcid_pmid = `${pmcidPart}_${pmidPart}`;
+        }
+
+        async function initAutoLoading() {
+            let loadedSuccessfullyCount = 0;
+
+            for (const [key, url] of Object.entries(fileUrls)) {
+                try {
+                    const response = await fetch(url);
+                    if (!response.ok) throw new Error(`HTTP Error Status: ${response.status}`);
+                    const buffer = await response.arrayBuffer();
+
+                    const workbook = XLSX.read(new Uint8Array(buffer), { type: 'array' });
+                    const sheetName = workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+
+                    const rows = XLSX.utils.sheet_to_json(sheet);
+
+                    // Inject compound key on load
+                    if (key === 'combined') {
+                        rows.forEach(p => sanitizeAndSetIdentifier(p));
+                    }
+                    datasets[key] = rows;
+
+                    updateLoadStatus(key, true);
+                    loadedSuccessfullyCount++;
+                } catch (e) {
+                    console.warn(`Excel Auto-loader bypass for ${key}: ${e.message}`);
+                    updateLoadStatus(key, false);
+                }
+            }
+
+            if (loadedSuccessfullyCount < 5) {
+                document.getElementById('upload-panel').classList.remove('hidden');
+            }
+
+            processDataStateAndRender();
+        }
+
+        // 2. MANUAL UPLOAD CONTROLLERS
+        function initManualUploadListeners() {
+            ['combined', 'antibiotics', 'diseases', 'genes', 'pathogens'].forEach(key => {
+                const input = document.getElementById(`upload-${key}`);
+                if (input) {
+                    input.addEventListener('change', (e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (event) => {
+                                const buffer = event.target.result;
+                                const workbook = XLSX.read(new Uint8Array(buffer), { type: 'array' });
+                                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                                const rows = XLSX.utils.sheet_to_json(sheet);
+
+                                if (key === 'combined') {
+                                    rows.forEach(p => sanitizeAndSetIdentifier(p));
+                                }
+                                datasets[key] = rows;
+                                updateLoadStatus(key, true);
+                                processDataStateAndRender();
+                            };
+                            reader.readAsArrayBuffer(file);
+                        }
+                    });
+                }
+            });
+        }
+
+        function updateLoadStatus(key, isSuccess) {
+            const combinedBadge = document.getElementById('status-combined');
+            const curatedBadge = document.getElementById('status-curated');
+            const fileInputIcon = document.getElementById(`icon-${key}`);
+            const fileInputLabel = document.getElementById(`label-${key}`);
+
+            if (isSuccess) {
+                if (fileInputIcon) fileInputIcon.className = "fa-solid fa-circle-check text-emerald-500 text-lg mb-1";
+                if (fileInputLabel) {
+                    fileInputLabel.innerText = "Loaded Automatically";
+                    fileInputLabel.className = "text-[10px] text-emerald-500 block mt-0.5";
+                }
+            }
+
+            // Calculate aggregate loads
+            let loadedCurations = 0;
+            ['antibiotics', 'diseases', 'genes', 'pathogens'].forEach(curKey => {
+                if (datasets[curKey] && datasets[curKey].length > 0) loadedCurations++;
+            });
+
+            if (datasets.combined && datasets.combined.length > 0) {
+                combinedBadge.className = "px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-2";
+                combinedBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Combined: ${datasets.combined.length} Papers</span>`;
+            } else {
+                combinedBadge.className = "px-3 py-1.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 flex items-center gap-2";
+                combinedBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span><span>Combined Data Missing</span>`;
+            }
+
+            curatedBadge.className = loadedCurations === 4 ?
+                "px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-2" :
+                "px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-2";
+            curatedBadge.innerHTML = `<span class="w-2 h-2 rounded-full ${loadedCurations === 4 ? 'bg-emerald-500' : 'bg-amber-500'}"></span><span>Curations: ${loadedCurations}/4 Loaded</span>`;
+        }
+
+        function switchTab(tabId) {
+            currentTab = tabId;
+            const tabs = ['analytics', 'curated', 'combined', 'mapping', 'explorer'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-btn-${t}`);
+                const content = document.getElementById(`tab-content-${t}`);
+                if (t === tabId) {
+                    btn.className = "px-5 py-3.5 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 transition flex items-center gap-2";
+                    content.classList.remove('hidden');
+                } else {
+                    btn.className = "px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-2";
+                    content.classList.add('hidden');
+                }
+            });
+
+            if (tabId === 'explorer') {
+                renderExplorerInterface();
+            }
+        }
+
+        // ================= DATA PROCESSING AND RENDERING ENGINE =================
+        function processDataStateAndRender() {
+            calculateOverallStats();
+            initCharts();
+            populateCombinedFilters();
+            loadSelectedCuratedSheet();
+            filterCombinedPapers();
+            extractAndComputeMappingMatrix();
+        }
+
+        function calculateOverallStats() {
+            const totalPapers = datasets.combined ? datasets.combined.length : 0;
+            document.getElementById('stat-total-papers').innerText = totalPapers.toLocaleString();
+
+            const totalCurated = (datasets.antibiotics?.length || 0) +
+                (datasets.diseases?.length || 0) +
+                (datasets.genes?.length || 0) +
+                (datasets.pathogens?.length || 0);
+            document.getElementById('stat-total-curations').innerText = totalCurated.toLocaleString();
+
+            const countries = new Set();
+            if (datasets.combined) {
+                datasets.combined.forEach(p => {
+                    if (p.country && String(p.country).trim() !== '') {
+                        countries.add(String(p.country).trim());
+                    }
+                });
+            }
+            document.getElementById('stat-total-countries').innerText = countries.size;
+        }
+
+        // Helper: Convert string '[A, B]' or actual arrays back to flat arrays
+        function parseListField(val) {
+            if (!val) return [];
+            if (Array.isArray(val)) return val;
+            let s = String(val).trim();
+            if (s.startsWith('[') && s.endsWith(']')) {
+                s = s.substring(1, s.length - 1);
+            }
+            if (s === '') return [];
+            return s.split(',').map(item => item.replace(/['"]+/g, '').trim()).filter(Boolean);
+        }
+
+        function initCharts() {
+            if (!datasets.combined || datasets.combined.length === 0) return;
+
+            if (geoChart) geoChart.destroy();
+            if (entityChart) entityChart.destroy();
+
+            const countryCounts = {};
+            datasets.combined.forEach(p => {
+                if (p.country && String(p.country).trim() !== '') {
+                    const country = String(p.country).trim();
+                    countryCounts[country] = (countryCounts[country] || 0) + 1;
+                }
+            });
+            const topCountries = Object.entries(countryCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 8);
+
+            const geoCtx = document.getElementById('chart-geography').getContext('2d');
+            geoChart = new Chart(geoCtx, {
+                type: 'bar',
+                data: {
+                    labels: topCountries.map(x => x[0]),
+                    datasets: [{
+                        label: 'Paper Publications',
+                        data: topCountries.map(x => x[1]),
+                        backgroundColor: '#4f46e5',
+                        borderRadius: 6,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: '#f1f5f9' }, ticks: { precision: 0 } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+
+            const entCtx = document.getElementById('chart-entities').getContext('2d');
+            entityChart = new Chart(entCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Antibiotics', 'Diseases', 'Genes', 'Pathogens'],
+                    datasets: [{
+                        data: [
+                            datasets.antibiotics?.length || 0,
+                            datasets.diseases?.length || 0,
+                            datasets.genes?.length || 0,
+                            datasets.pathogens?.length || 0
+                        ],
+                        backgroundColor: ['#f59e0b', '#ef4444', '#10b981', '#3b82f6'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 10 } } } }
+                }
+            });
+        }
+
+        // ================= CURATED SHEET DIRECTORIES EXPLORER =================
+        function loadSelectedCuratedSheet() {
+            curatedActiveSheet = document.getElementById('curated-sheet-selector').value;
+            curatedValueFilter = document.getElementById('curated-value-filter').value;
+            const activeData = datasets[curatedActiveSheet] || [];
+
+            curatedPage = 1;
+            curatedSearchFilteredData = [...activeData];
+            filterCuratedTable();
+        }
+
+        function filterCuratedTable() {
+            const query = document.getElementById('search-curated').value.toLowerCase();
+            const originalData = datasets[curatedActiveSheet] || [];
+            curatedValueFilter = document.getElementById('curated-value-filter').value;
+
+            const keys = originalData.length > 0 ? Object.keys(originalData[0]) : [];
+            const origKey = keys[0];
+            const curatedKey = keys[1];
+
+            curatedSearchFilteredData = originalData.filter(row => {
+                const origVal = String(row[origKey] || '').toLowerCase();
+                const curVal = String(row[curatedKey] || '').toLowerCase();
+
+                const matchesSearch = origVal.includes(query) || curVal.includes(query);
+
+                let matchesValueFilter = true;
+                if (curatedValueFilter === 'populated') {
+                    matchesValueFilter = (curVal.trim() !== '' && curVal.trim() !== 'nan');
+                } else if (curatedValueFilter === 'empty') {
+                    matchesValueFilter = (curVal.trim() === '' || curVal.trim() === 'nan');
+                }
+
+                return matchesSearch && matchesValueFilter;
+            });
+
+            curatedPage = 1;
+            renderCuratedTable();
+        }
+
+        // Re-inject pagination for Curated Dictionary Items
+        function renderCuratedTable() {
+            const tbody = document.getElementById('curated-table-body');
+            tbody.innerHTML = '';
+
+            if (curatedSearchFilteredData.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" class="p-8 text-center text-slate-400">No matching mappings found in this collection.</td></tr>`;
+                document.getElementById('curated-pagination-info').innerText = "Showing 0 of 0";
+                return;
+            }
+
+            const keys = Object.keys(curatedSearchFilteredData[0]);
+            const origKey = keys[0];
+            const curatedKey = keys[1];
+
+            const startIdx = (curatedPage - 1) * curatedPageSize;
+            const endIdx = Math.min(startIdx + curatedPageSize, curatedSearchFilteredData.length);
+            const paginatedRows = curatedSearchFilteredData.slice(startIdx, endIdx);
+
+            paginatedRows.forEach(row => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-4 border-b border-slate-100 font-mono text-slate-600">${row[origKey] || '-'}</td>
+                        <td class="p-4 border-b border-slate-100">
+                            <span class="inline-block px-2.5 py-1 rounded bg-indigo-50 border border-indigo-100 text-indigo-700 font-semibold">${row[curatedKey] || '<span class="text-slate-300">Unmapped / Rejected</span>'}</span>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('curated-pagination-info').innerText = `Showing ${startIdx + 1} - ${endIdx} of ${curatedSearchFilteredData.length} mappings`;
+            document.getElementById('curated-goto-page').value = curatedPage;
+        }
+
+        function changeCuratedPage(direction) {
+            const totalPages = Math.ceil(curatedSearchFilteredData.length / curatedPageSize);
+            curatedPage += direction;
+            if (curatedPage < 1) curatedPage = 1;
+            if (curatedPage > totalPages) curatedPage = totalPages;
+            renderCuratedTable();
+        }
+
+        function changeCuratedPageSize(size) {
+            curatedPageSize = parseInt(size);
+            curatedPage = 1;
+            renderCuratedTable();
+        }
+
+        // Paging jumps for Curated Dictionaries
+        function jumpToCuratedPage(val) {
+            const pageNum = parseInt(val);
+            const totalPages = Math.ceil(curatedSearchFilteredData.length / curatedPageSize);
+            if (pageNum >= 1 && pageNum <= totalPages) {
+                curatedPage = pageNum;
+                renderCuratedTable();
+            }
+        }
+
+        // ================= COMBINED PAPERS INSPECTOR & GRID =================
+        function populateCombinedFilters() {
+            const countryFilter = document.getElementById('paper-filter-country');
+            countryFilter.innerHTML = '<option value="">All Countries</option>';
+
+            const countries = new Set();
+            if (datasets.combined) {
+                datasets.combined.forEach(p => {
+                    if (p.country && String(p.country).trim() !== '') {
+                        countries.add(String(p.country).trim());
+                    }
+                });
+            }
+
+            Array.from(countries).sort().forEach(country => {
+                countryFilter.innerHTML += `<option value="${country}">${country}</option>`;
+            });
+        }
+
+        function filterCombinedPapers() {
+            if (!datasets.combined || datasets.combined.length === 0) return;
+
+            const searchQuery = document.getElementById('paper-search').value.toLowerCase();
+            const countryFilter = document.getElementById('paper-filter-country').value;
+            const alignmentFilter = document.getElementById('paper-filter-discrepancy').value;
+
+            papersFilteredData = datasets.combined.filter(p => {
+                if (countryFilter && p.country !== countryFilter) return false;
+
+                const title = String(p.title || '').toLowerCase();
+                const pmid = String(p.pmid || '').toLowerCase();
+                const pmcid = String(p.pmcid || '').toLowerCase();
+                const pmcid_pmid = String(p.pmcid_pmid || '').toLowerCase();
+                const authors = String(p.authorlist || '').toLowerCase();
+                if (searchQuery && !title.includes(searchQuery) && !pmid.includes(searchQuery) && !pmcid.includes(searchQuery) && !pmcid_pmid.includes(searchQuery) && !authors.includes(searchQuery)) return false;
+
+                if (alignmentFilter) {
+                    let hasMismatch = false;
+                    ['genes', 'diseases', 'pathogens', 'chemicals'].forEach(type => {
+                        const extCol = `extracted_${type}`;
+                        const curCol = `curated_${type === 'chemicals' ? 'antibiotics' : type}`;
+
+                        const extracted = parseListField(p[extCol]);
+                        const curated = parseListField(p[curCol]);
+
+                        const matched = extracted.filter(e => curated.map(c => c.toLowerCase()).includes(e.toLowerCase()));
+                        if (matched.length !== extracted.length || extracted.length !== curated.length) {
+                            hasMismatch = true;
+                        }
+                    });
+
+                    if (alignmentFilter === 'match' && hasMismatch) return false;
+                    if (alignmentFilter === 'mismatch' && !hasMismatch) return false;
+                }
+
+                return true;
+            });
+
+            papersPage = 1;
+            renderCombinedGrid();
+        }
+
+        function renderCombinedGrid() {
+            const tbody = document.getElementById('combined-grid-body');
+            tbody.innerHTML = '';
+
+            const total = papersFilteredData.length;
+            document.getElementById('filtered-papers-count').innerText = `${total} Paper${total === 1 ? '' : 's'}`;
+
+            if (total === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="p-8 text-center text-slate-400">No matching registry records found.</td></tr>`;
+                document.getElementById('papers-pagination-info').innerText = "Showing 0 of 0";
+                return;
+            }
+
+            const startIdx = (papersPage - 1) * papersPageSize;
+            const endIdx = Math.min(startIdx + papersPageSize, total);
+            const paginated = papersFilteredData.slice(startIdx, endIdx);
+
+            paginated.forEach((p, idx) => {
+                let parsedAuthors = parseListField(p.authorlist);
+                let authorDisplayStr = parsedAuthors.length > 0 ? parsedAuthors.slice(0, 2).join(', ') : 'Unknown';
+                if (parsedAuthors.length > 2) authorDisplayStr += ' et al.';
+
+                const totalC = parseListField(p.curated_genes).length + parseListField(p.curated_diseases).length + parseListField(p.curated_pathogens).length + parseListField(p.curated_antibiotics).length;
+                const totalE = parseListField(p.extracted_genes).length + parseListField(p.extracted_diseases).length + parseListField(p.extracted_pathogens).length + parseListField(p.extracted_chemicals).length;
+
+                const isSelected = activeSelectedPaper && activeSelectedPaper.pmcid_pmid === p.pmcid_pmid;
+                const activeClass = isSelected ? 'bg-indigo-50 border-l-4 border-indigo-600 text-indigo-950 font-semibold' : 'hover:bg-slate-50/80 cursor-pointer text-slate-700';
+
+                tbody.innerHTML += `
+                    <tr class="${activeClass} transition cursor-pointer" onclick="selectPaper('${p.pmcid_pmid}')">
+                        <td class="p-3 font-semibold text-indigo-600">
+                            ${p.pmcid_pmid || 'NaN_NaN'}<br>
+                        </td>
+                        <td class="p-3">
+                            <span class="text-xs font-semibold text-slate-800 line-clamp-1">${p.title || 'Untitled'}</span>
+                            <span class="text-[9px] text-slate-400 block">${authorDisplayStr} (${p.year || '2020'})</span>
+                        </td>
+                        <td class="p-3 text-center text-[11px] text-slate-600">${p.country || '-'}</td>
+                        <td class="p-3 text-center">
+                            <span class="inline-block px-1.5 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-700">${totalC} / ${totalE}</span>
+                        </td>
+                        <td class="p-3 text-center">
+                            <button onclick="event.stopPropagation(); openPaperModal('${p.pmcid_pmid}')" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-[10px] font-bold flex items-center justify-center gap-1 mx-auto shadow transition" title="Show Detailed Metadata and Full Text">
+                                <i class="fa-solid fa-expand"></i> View
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('papers-pagination-info').innerText = `Showing ${startIdx + 1} - ${endIdx} of ${total} papers`;
+            document.getElementById('papers-goto-page').value = papersPage;
+        }
+
+        function selectPaper(pmcid_pmid) {
+            const paper = datasets.combined.find(p => p.pmcid_pmid === pmcid_pmid);
+            if (!paper) return;
+
+            activeSelectedPaper = paper;
+            renderCombinedGrid();
+
+            document.getElementById('inspector-placeholder').classList.add('hidden');
+            document.getElementById('inspector-active-content').classList.remove('hidden');
+
+            document.getElementById('inspect-pmcid-pmid').innerText = `Composite ID: ${paper.pmcid_pmid || 'NaN_NaN'}`;
+            document.getElementById('inspect-title').innerText = paper.title || 'Untitled Document';
+            document.getElementById('inspect-abstract').innerText = paper.abstracttext || 'No abstract text summary available.';
+
+            let parsedAuthors = parseListField(paper.authorlist);
+            document.getElementById('inspect-authors').innerText = `Authors: ${parsedAuthors.join(', ')} (${paper.year || 'Unknown'})`;
+
+            // Configure Active Audit inspector expand detailed viewer button
+            document.getElementById('inspect-expand-btn').setAttribute('onclick', `openPaperModal('${paper.pmcid_pmid}')`);
+
+            renderCategoryMatrix('genes', parseListField(paper.extracted_genes), parseListField(paper.curated_genes));
+            renderCategoryMatrix('diseases', parseListField(paper.extracted_diseases), parseListField(paper.curated_diseases));
+            renderCategoryMatrix('pathogens', parseListField(paper.extracted_pathogens), parseListField(paper.curated_pathogens));
+            renderCategoryMatrix('antibiotics', parseListField(paper.extracted_chemicals), parseListField(paper.curated_antibiotics));
+        }
+
+        function renderCategoryMatrix(cat, extracted, curated) {
+            const extContainer = document.getElementById(`inspect-extracted-${cat}`);
+            const curContainer = document.getElementById(`inspect-curated-${cat}`);
+
+            extContainer.innerHTML = '';
+            curContainer.innerHTML = '';
+
+            if (extracted.length === 0) {
+                extContainer.innerHTML = `<span class="text-[10px] text-slate-400 italic">None Extracted</span>`;
+            } else {
+                extracted.forEach(item => {
+                    extContainer.innerHTML += `
+                        <span class="inline-block text-[9px] px-2 py-0.5 rounded font-medium bg-indigo-50 text-indigo-700 border border-indigo-250">
+                            ${item}
+                        </span>`;
+                });
+            }
+
+            if (curated.length === 0) {
+                curContainer.innerHTML = `<span class="text-[10px] text-slate-400 italic">None Curated</span>`;
+            } else {
+                curated.forEach(item => {
+                    curContainer.innerHTML += `
+                        <span class="inline-block text-[9px] px-2 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-250">
+                            ${item}
+                        </span>`;
+                });
+            }
+        }
+
+        function changePapersPage(direction) {
+            const totalPages = Math.ceil(papersFilteredData.length / papersPageSize);
+            papersPage += direction;
+            if (papersPage < 1) papersPage = 1;
+            if (papersPage > totalPages) papersPage = totalPages;
+            renderCombinedGrid();
+        }
+
+        function changePapersPageSize(size) {
+            papersPageSize = parseInt(size);
+            papersPage = 1;
+            renderCombinedGrid();
+        }
+
+        function jumpToPapersPage(val) {
+            const pageNum = parseInt(val);
+            const totalPages = Math.ceil(papersFilteredData.length / papersPageSize);
+            if (pageNum >= 1 && pageNum <= totalPages) {
+                papersPage = pageNum;
+                renderCombinedGrid();
+            }
+        }
+
+        // ================= INTERACTIVE MAPPING TAB LOGIC =================
+        function extractAndComputeMappingMatrix() {
+            if (!datasets.combined || datasets.combined.length === 0) return;
+
+            const mapSet = new Map();
+
+            datasets.combined.forEach(p => {
+                const diseases = parseListField(p.curated_diseases);
+                const pathogens = parseListField(p.curated_pathogens);
+                const genes = parseListField(p.curated_genes);
+                const antibiotics = parseListField(p.curated_antibiotics);
+
+                const dList = diseases.length > 0 ? diseases : ['-'];
+                const pList = pathogens.length > 0 ? pathogens : ['-'];
+                const gList = genes.length > 0 ? genes : ['-'];
+                const aList = antibiotics.length > 0 ? antibiotics : ['-'];
+
+                dList.forEach(d => {
+                    pList.forEach(path => {
+                        gList.forEach(g => {
+                            aList.forEach(a => {
+                                const key = `${d}|||${path}|||${g}|||${a}`;
+                                if (!mapSet.has(key)) {
+                                    mapSet.set(key, []);
+                                }
+                                mapSet.get(key).push(p);
+                            });
+                        });
+                    });
+                });
+            });
+
+            uniqueMappingsData = [];
+            mapSet.forEach((associatedPapers, key) => {
+                const [disease, pathogen, gene, antibiotic] = key.split('|||');
+                uniqueMappingsData.push({
+                    disease,
+                    pathogen,
+                    gene,
+                    antibiotic,
+                    papers: associatedPapers
+                });
+            });
+
+            filterUniqueMappingMatrix();
+        }
+
+        function filterUniqueMappingMatrix() {
+            const fDisease = document.getElementById('map-filter-disease').value.toLowerCase();
+            const fPathogen = document.getElementById('map-filter-pathogen').value.toLowerCase();
+            const fGene = document.getElementById('map-filter-gene').value.toLowerCase();
+            const fAntibiotic = document.getElementById('map-filter-antibiotic').value.toLowerCase();
+
+            uniqueMappingsFiltered = uniqueMappingsData.filter(m => {
+                return (fDisease === '' || m.disease.toLowerCase().includes(fDisease)) &&
+                    (fPathogen === '' || m.pathogen.toLowerCase().includes(fPathogen)) &&
+                    (fGene === '' || m.gene.toLowerCase().includes(fGene)) &&
+                    (fAntibiotic === '' || m.antibiotic.toLowerCase().includes(fAntibiotic));
+            });
+
+            mappingPage = 1;
+            renderUniqueMappingMatrix();
+        }
+
+        function renderUniqueMappingMatrix() {
+            const tbody = document.getElementById('mapping-grid-body');
+            tbody.innerHTML = '';
+
+            const total = uniqueMappingsFiltered.length;
+            document.getElementById('mapping-pagination-info').innerText = `Showing ${total} pathway combinations`;
+
+            if (total === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-slate-400">No pathways discovered under these filter bounds.</td></tr>`;
+                return;
+            }
+
+            const startIdx = (mappingPage - 1) * mappingPageSize;
+            const endIdx = Math.min(startIdx + mappingPageSize, total);
+            const paginated = uniqueMappingsFiltered.slice(startIdx, endIdx);
+
+            paginated.forEach((m, idx) => {
+                const isSelected = activeSelectedPathway &&
+                    activeSelectedPathway.disease === m.disease &&
+                    activeSelectedPathway.pathogen === m.pathogen &&
+                    activeSelectedPathway.gene === m.gene &&
+                    activeSelectedPathway.antibiotic === m.antibiotic;
+
+                const activeClass = isSelected ? 'bg-indigo-50 border-l-4 border-indigo-600 text-indigo-950 font-semibold' : 'hover:bg-slate-50/80 text-slate-700';
+
+                const tr = document.createElement('tr');
+                tr.className = `${activeClass} transition cursor-pointer border-b border-slate-100`;
+                tr.onclick = () => selectPathwayRow(m);
+                tr.innerHTML = `
+                    <td class="p-3 font-semibold ${isSelected ? 'text-indigo-800' : 'text-slate-800'}">${m.disease}</td>
+                    <td class="p-3 font-mono text-xs text-blue-700">${m.pathogen}</td>
+                    <td class="p-3 font-mono text-xs text-emerald-700">${m.gene}</td>
+                    <td class="p-3 font-semibold text-amber-700">${m.antibiotic}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('mapping-goto-page').value = mappingPage;
+        }
+
+        function selectPathwayRow(pathway) {
+            activeSelectedPathway = pathway;
+            renderUniqueMappingMatrix();
+
+            const listContainer = document.getElementById('mapping-papers-list');
+            const placeholder = document.getElementById('mapping-papers-placeholder');
+
+            listContainer.innerHTML = '';
+            placeholder.classList.add('hidden');
+            listContainer.classList.remove('hidden');
+
+            pathway.papers.forEach(p => {
+                let parsedAuthors = parseListField(p.authorlist);
+                let authorDisplayStr = parsedAuthors.length > 0 ? parsedAuthors.slice(0, 2).join(', ') : 'Unknown';
+                if (parsedAuthors.length > 2) authorDisplayStr += ' et al.';
+
+                listContainer.innerHTML += `
+                    <div class="p-3 bg-slate-50 border border-slate-200 hover:border-indigo-400 rounded-lg transition duration-150 space-y-2 cursor-pointer relative group" onclick="switchTab('combined'); selectPaper('${p.pmcid_pmid}');">
+                        <div class="flex justify-between items-start gap-1">
+                            <span class="text-[9px] uppercase font-bold tracking-wider text-indigo-600">ID: ${p.pmcid_pmid || 'NaN_NaN'}</span>
+                            <button onclick="event.stopPropagation(); openPaperModal('${p.pmcid_pmid}')" class="opacity-100 sm:opacity-0 group-hover:opacity-100 px-1.5 py-0.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-[8px] font-bold flex items-center gap-0.5 shadow transition" title="Show Detailed Metadata and Full Text">
+                                <i class="fa-solid fa-expand"></i> View
+                            </button>
+                        </div>
+                        <h5 class="text-xs font-bold text-slate-800 leading-snug line-clamp-2">${p.title || 'Untitled'}</h5>
+                        <p class="text-[10px] text-slate-500">${authorDisplayStr} (${p.year || '2020'})</p>
+                    </div>
+                `;
+            });
+        }
+
+        function changeMappingPage(direction) {
+            const totalPages = Math.ceil(uniqueMappingsFiltered.length / mappingPageSize);
+            mappingPage += direction;
+            if (mappingPage < 1) mappingPage = 1;
+            if (mappingPage > totalPages) mappingPage = totalPages;
+            renderUniqueMappingMatrix();
+        }
+
+        function changeMappingPageSize(size) {
+            mappingPageSize = parseInt(size);
+            mappingPage = 1;
+            renderUniqueMappingMatrix();
+        }
+
+        function jumpToMappingPage(val) {
+            const pageNum = parseInt(val);
+            const totalPages = Math.ceil(uniqueMappingsFiltered.length / mappingPageSize);
+            if (pageNum >= 1 && pageNum <= totalPages) {
+                mappingPage = pageNum;
+                renderUniqueMappingMatrix();
+            }
+        }
+
+        // ================= 6-COLUMN EXPLORER TAB LOGIC =================
+        function renderExplorerInterface() {
+            if (!datasets.combined || datasets.combined.length === 0) return;
+
+            const uGenes = new Set();
+            const uPathogens = new Set();
+            const uDiseases = new Set();
+            const uAntibiotics = new Set();
+
+            datasets.combined.forEach(p => {
+                parseListField(p.curated_genes).forEach(x => uGenes.add(x));
+                parseListField(p.curated_pathogens).forEach(x => uPathogens.add(x));
+                parseListField(p.curated_diseases).forEach(x => uDiseases.add(x));
+                parseListField(p.curated_antibiotics).forEach(x => uAntibiotics.add(x));
+            });
+
+            renderExplorerColumnList('gene', Array.from(uGenes).sort());
+            renderExplorerColumnList('pathogen', Array.from(uPathogens).sort());
+            renderExplorerColumnList('disease', Array.from(uDiseases).sort());
+            renderExplorerColumnList('antibiotic', Array.from(uAntibiotics).sort());
+        }
+
+        function renderExplorerColumnList(type, list) {
+            const container = document.getElementById(`explorer-${type}s-list`);
+            container.innerHTML = '';
+
+            list.forEach(item => {
+                const el = document.createElement('div');
+                el.className = "px-2 py-1.5 rounded hover:bg-slate-200/60 cursor-pointer truncate transition-colors text-[11px] font-medium border border-transparent";
+                el.innerText = item;
+                el.setAttribute('data-val', item);
+                el.onclick = () => selectExplorerEntity(type, item, el);
+                container.appendChild(el);
+            });
+        }
+
+        function filterExplorerLists(type) {
+            const q = document.getElementById(`explorer-search-${type}`).value.toLowerCase();
+            const container = document.getElementById(`explorer-${type}s-list`);
+            const divs = container.getElementsByTagName('div');
+
+            for (let i = 0; i < divs.length; i++) {
+                const txt = divs[i].innerText.toLowerCase();
+                if (txt.includes(q)) {
+                    divs[i].classList.remove('hidden');
+                } else {
+                    divs[i].classList.add('hidden');
+                }
+            }
+        }
+
+        function selectExplorerEntity(type, val, element) {
+            const types = ['gene', 'pathogen', 'disease', 'antibiotic'];
+            types.forEach(t => {
+                const list = document.getElementById(`explorer-${t}s-list`);
+                const divs = list.getElementsByTagName('div');
+                for (let i = 0; i < divs.length; i++) {
+                    divs[i].className = "px-2 py-1.5 rounded hover:bg-slate-200/60 cursor-pointer truncate transition-colors text-[11px] font-medium border border-transparent";
+                }
+            });
+
+            element.className = "px-2 py-1.5 rounded bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold truncate cursor-pointer text-[11px]";
+
+            explorerActiveEntities.type = type;
+            explorerActiveEntities.value = val;
+
+            const matches = datasets.combined.filter(p => {
+                const colName = `curated_${type === 'antibiotic' ? 'antibiotics' : type + 's'}`;
+                const arr = parseListField(p[colName]);
+                return arr.some(x => x.toLowerCase() === val.toLowerCase());
+            });
+
+            const papersList = document.getElementById('explorer-papers-list');
+            papersList.innerHTML = '';
+
+            if (matches.length === 0) {
+                papersList.innerHTML = `<span class="text-slate-400 italic block text-center mt-12 text-[10px]">No linked documents found.</span>`;
+                return;
+            }
+
+            matches.forEach(p => {
+                const el = document.createElement('div');
+                el.className = "p-2 bg-white hover:bg-indigo-50/50 border border-slate-200 rounded-lg cursor-pointer transition duration-150 space-y-1 relative group";
+                el.onclick = () => selectExplorerPaperDetails(p);
+                el.innerHTML = `
+                    <div class="flex justify-between items-start gap-1">
+                        <span class="text-[8px] uppercase font-extrabold text-indigo-600 block">ID: ${p.pmcid_pmid || 'NaN_NaN'}</span>
+                        <button onclick="event.stopPropagation(); openPaperModal('${p.pmcid_pmid}')" class="opacity-100 sm:opacity-0 group-hover:opacity-100 px-1 py-0.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-[7px] font-bold shadow transition" title="Show Detailed Metadata and Full Text">
+                            <i class="fa-solid fa-expand"></i>
+                        </button>
+                    </div>
+                    <h5 class="font-bold text-slate-800 text-[11px] leading-tight line-clamp-2">${p.title || 'Untitled'}</h5>
+                `;
+                papersList.appendChild(el);
+            });
+        }
+
+        function selectExplorerPaperDetails(p) {
+            const detailsBox = document.getElementById('explorer-paper-details');
+            detailsBox.innerHTML = '';
+
+            let parsedAuthors = parseListField(p.authorlist);
+            let authorDisplayStr = parsedAuthors.length > 0 ? parsedAuthors.slice(0, 2).join(', ') : 'Unknown';
+            if (parsedAuthors.length > 2) authorDisplayStr += ' et al.';
+
+            const rawGenes = parseListField(p.curated_genes);
+            const rawDiseases = parseListField(p.curated_diseases);
+            const rawPathogens = parseListField(p.curated_pathogens);
+            const rawAntibiotics = parseListField(p.curated_antibiotics);
+
+            detailsBox.innerHTML = `
+                <div class="space-y-3.5">
+                    <div class="p-2.5 bg-slate-50 border border-slate-100 rounded-lg">
+                        <span class="text-[8px] font-extrabold text-slate-400 block uppercase tracking-wider">ID: ${p.pmcid_pmid}</span>
+                        <h5 class="font-bold text-slate-800 text-xs leading-snug mt-1">${p.title || 'Untitled'}</h5>
+                        <p class="text-[9px] text-slate-500 mt-1">${authorDisplayStr} (${p.year || '2020'}) | ${p.country || 'N/A'}</p>
+                    </div>
+
+                    <div class="space-y-1">
+                        <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Curated Genes</span>
+                        <div class="flex flex-wrap gap-1">
+                            ${rawGenes.length > 0 ? rawGenes.map(g => `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded text-[10px] font-medium">${g}</span>`).join('') : '<span class="text-[10px] text-slate-400 italic">None</span>'}
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Curated Diseases</span>
+                        <div class="flex flex-wrap gap-1">
+                            ${rawDiseases.length > 0 ? rawDiseases.map(d => `<span class="bg-rose-50 text-rose-700 border border-rose-200 px-1.5 py-0.5 rounded text-[10px] font-medium">${d}</span>`).join('') : '<span class="text-[10px] text-slate-400 italic">None</span>'}
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Curated Pathogens</span>
+                        <div class="flex flex-wrap gap-1">
+                            ${rawPathogens.length > 0 ? rawPathogens.map(pat => `<span class="bg-blue-50 text-blue-700 border border-blue-200 px-1.5 py-0.5 rounded text-[10px] font-medium">${pat}</span>`).join('') : '<span class="text-[10px] text-slate-400 italic">None</span>'}
+                        </div>
+                    </div>
+
+                    <div class="space-y-1">
+                        <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Curated Antibiotics</span>
+                        <div class="flex flex-wrap gap-1">
+                            ${rawAntibiotics.length > 0 ? rawAntibiotics.map(a => `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-1.5 py-0.5 rounded text-[10px] font-medium">${a}</span>`).join('') : '<span class="text-[10px] text-slate-400 italic">None</span>'}
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-100 flex flex-col gap-2">
+                        <button onclick="openPaperModal('${p.pmcid_pmid}')" class="w-full text-center py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-[10px] rounded-lg shadow transition">
+                            <i class="fa-solid fa-expand mr-1"></i> Open Detailed Modal
+                        </button>
+                        <button onclick="switchTab('combined'); selectPaper('${p.pmcid_pmid}');" class="w-full text-center py-1.5 border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-[10px] rounded-lg shadow transition">
+                            <i class="fa-solid fa-microscope mr-1"></i> Audit In Inspector
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ================= DETAILED MODAL LOGIC & TAB CONTROL =================
+        let modalActiveTab = 'abstract';
+        let currentModalPaper = null;
+
+        function openPaperModal(pmcid_pmid) {
+            const paper = datasets.combined.find(p => p.pmcid_pmid === pmcid_pmid);
+            if (!paper) {
+                alert("Paper context not loaded or missing from workspace.");
+                return;
+            }
+
+            currentModalPaper = paper;
+            document.getElementById('paper-modal').classList.remove('hidden');
+
+            // Render Header and Metadata
+            document.getElementById('modal-paper-id').innerText = `Composite Identifier (PMCID_PMID): ${paper.pmcid_pmid || 'NaN_NaN'}`;
+            document.getElementById('modal-title').innerText = paper.title || 'Untitled Document';
+            document.getElementById('modal-title').title = paper.title || '';
+            document.getElementById('modal-abstract-text').innerText = paper.abstracttext || 'No abstract content mapped in dataset.';
+
+            let parsedAuthors = parseListField(paper.authorlist);
+            document.getElementById('modal-authors').innerText = parsedAuthors.join(', ') || 'Unknown Authors';
+            document.getElementById('modal-country').innerText = paper.country || 'N/A';
+            document.getElementById('modal-year').innerText = paper.year || 'Unknown';
+            document.getElementById('modal-affiliation').innerText = parseListField(paper.affiliationinfo).join('\n') || 'None recorded.';
+
+            // Keywords rendering
+            const kwContainer = document.getElementById('modal-keywords-container');
+            const kwDiv = document.getElementById('modal-keywords');
+            kwDiv.innerHTML = '';
+            const keywords = parseListField(paper.keywordlist);
+            if (keywords.length > 0) {
+                kwContainer.classList.remove('hidden');
+                keywords.forEach(kw => {
+                    kwDiv.innerHTML += `<span class="bg-indigo-50 border border-indigo-100 text-indigo-700 px-2 py-0.5 rounded text-[10px] font-medium truncate">${kw}</span>`;
+                });
+            } else {
+                kwContainer.classList.add('hidden');
+            }
+
+            // MeSH Headings rendering
+            const meshContainer = document.getElementById('modal-mesh-container');
+            const meshDiv = document.getElementById('modal-mesh');
+            meshDiv.innerHTML = '';
+            const mesh = parseListField(paper.meshheadings);
+            if (mesh.length > 0) {
+                meshContainer.classList.remove('hidden');
+                mesh.forEach(m => {
+                    meshDiv.innerHTML += `<span class="bg-slate-100 border border-slate-200 text-slate-700 px-2 py-0.5 rounded text-[10px] font-medium truncate">${m}</span>`;
+                });
+            } else {
+                meshContainer.classList.add('hidden');
+            }
+
+            // Entity Matrices (Same colors as inspector grid)
+            renderCategoryMatrixReplica('genes', parseListField(paper.extracted_genes), parseListField(paper.curated_genes));
+            renderCategoryMatrixReplica('diseases', parseListField(paper.extracted_diseases), parseListField(paper.curated_diseases));
+            renderCategoryMatrixReplica('pathogens', parseListField(paper.extracted_pathogens), parseListField(paper.curated_pathogens));
+            renderCategoryMatrixReplica('antibiotics', parseListField(paper.extracted_chemicals), parseListField(paper.curated_antibiotics));
+
+            // Default Modal Tab to Abstract
+            switchModalTab('abstract');
+        }
+
+        function closePaperModal() {
+            document.getElementById('paper-modal').classList.add('hidden');
+            const fviewer = document.getElementById('fulltext-viewer');
+            fviewer.innerHTML = ''; // clear viewer contents (disconnect active pdf iframes/text)
+            currentModalPaper = null;
+        }
+
+        function switchModalTab(tabId) {
+            modalActiveTab = tabId;
+            const btnAbstract = document.getElementById('modal-tab-abstract');
+            const btnFulltext = document.getElementById('modal-tab-fulltext');
+            const panelAbstract = document.getElementById('modal-content-abstract');
+            const panelFulltext = document.getElementById('modal-content-fulltext');
+
+            if (tabId === 'abstract') {
+                btnAbstract.className = "px-5 py-3 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 transition flex items-center gap-1.5";
+                btnFulltext.className = "px-5 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5";
+                panelAbstract.classList.remove('hidden');
+                panelFulltext.classList.add('hidden');
+            } else {
+                btnFulltext.className = "px-5 py-3 text-xs font-bold border-b-2 border-indigo-600 text-indigo-600 transition flex items-center gap-1.5";
+                btnAbstract.className = "px-5 py-3 text-xs font-bold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-1.5";
+                panelAbstract.classList.add('hidden');
+                panelFulltext.classList.remove('hidden');
+
+                // Trigger lazy full text parsing engine
+                resolveAndRenderFullText();
+            }
+        }
+
+        function renderCategoryMatrixReplica(cat, extracted, curated) {
+            const container = document.getElementById(`modal-badges-${cat}`);
+            container.innerHTML = '';
+
+            if (extracted.length === 0 && curated.length === 0) {
+                container.innerHTML = `<span class="text-[10px] text-slate-400 italic">None flagged</span>`;
+                return;
+            }
+
+            extracted.forEach(item => {
+                const isMatch = curated.map(c => c.toLowerCase()).includes(item.toLowerCase());
+                const badgeColor = isMatch ? 'bg-emerald-50 text-emerald-700 border-emerald-250' : 'bg-indigo-50 text-indigo-700 border-indigo-250';
+                container.innerHTML += `<span class="inline-block text-[9px] px-2 py-0.5 rounded font-medium ${badgeColor} border mr-1 mb-1">${item}</span>`;
+            });
+
+            curated.forEach(item => {
+                const isMatch = extracted.map(e => e.toLowerCase()).includes(item.toLowerCase());
+                if (!isMatch) {
+                    container.innerHTML += `<span class="inline-block text-[9px] px-2 py-0.5 rounded font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 mr-1 mb-1">${item}</span>`;
+                }
+            });
+        }
+
+        async function resolveAndRenderFullText() {
+            const loader = document.getElementById('fulltext-loader');
+            const viewer = document.getElementById('fulltext-viewer');
+
+            loader.classList.remove('hidden');
+            viewer.innerHTML = '';
+
+            if (!currentModalPaper) return;
+            const pmid = parseInt(currentModalPaper.pmid);
+
+            // Helper to render fallback pdf iframes
+            const renderPdfFallback = () => {
+                viewer.innerHTML = `
+                    <div class="h-full flex flex-col space-y-2">
+                        <div class="flex justify-between items-center bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                            <span class="text-xs font-bold text-slate-700"><i class="fa-solid fa-file-pdf text-rose-500 mr-1"></i> Rendering original PDF Fulltext article</span>
+                            <span class="text-[10px] text-slate-400">viewdata/pdf_fulltext_article_files/PMID_${pmid}.pdf</span>
+                        </div>
+                        <iframe src="viewdata/pdf_fulltext_article_files/PMID_${pmid}.pdf" class="flex-1 w-full h-[550px] border-0 rounded-lg shadow-inner"></iframe>
+                    </div>
+                `;
+                loader.classList.add('hidden');
+            };
+
+            // 1. Fetch JSON file and Cache
+            if (!fulltextArticlesCache) {
+                try {
+                    const response = await fetch('viewdata/fulltext-articles.json');
+                    if (response.ok) {
+                        fulltextArticlesCache = await response.json();
+                    } else {
+                        throw new Error(`Fulltext JSON fetch failed: ${response.status}`);
+                    }
+                } catch (e) {
+                    console.warn("Full text JSON was unreachable or missing. Rendering PDF Fallback.", e);
+                    renderPdfFallback();
+                    return;
+                }
+            }
+
+            // 2. Search PMID in JSON Cache Array
+            const targetArticle = fulltextArticlesCache.find(item => parseInt(item.pmid) === pmid);
+
+            if (targetArticle && targetArticle.fulltext && targetArticle.fulltext.trim() !== "" && targetArticle.fulltext.trim() !== "PMCID not found.") {
+                // Render nicely structured Reader View (Word-processor Paper Sheet Simulator)
+                const paragraphs = targetArticle.fulltext.split('\n\n').filter(p => p.trim() !== '');
+                let formattedText = paragraphs.map(p => `
+                    <p class="font-serif text-[13px] md:text-sm text-slate-800 leading-relaxed text-justify mb-5 indent-6">
+                        ${p.replace(/\n/g, ' ')}
+                    </p>
+                `).join('');
+
+                viewer.innerHTML = `
+                    <div class="bg-slate-100/80 p-4 md:p-8 rounded-xl border border-slate-200 min-h-[600px] flex justify-center items-start shadow-inner">
+                        <!-- Word Document Paper Simulator Sheet -->
+                        <div class="bg-white max-w-2xl w-full px-8 md:px-12 py-12 md:py-16 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-slate-200/80 rounded-sm relative" style="font-family: Georgia, Cambria, 'Times New Roman', serif;">
+
+                            <!-- Header running ruler -->
+                            <div class="border-b border-slate-300 pb-2 mb-6 flex justify-between items-center text-[10px] text-slate-400 font-sans tracking-wide">
+                                <span class="uppercase font-semibold text-indigo-600">Preprint Full-Text manuscript reader</span>
+                                <span>Page 1 / 1</span>
+                            </div>
+
+                            <!-- Document Meta Header -->
+                            <div class="mb-8 font-sans">
+                                <h4 class="text-sm font-bold text-slate-900 border-l-2 border-indigo-600 pl-2 leading-snug">${currentModalPaper.title || 'Untitled Document'}</h4>
+                                <div class="mt-2 text-[11px] text-slate-500 space-y-0.5">
+                                    <p><strong>Authors:</strong> ${parseListField(currentModalPaper.authorlist).join(', ') || 'N/A'}</p>
+                                    <p><strong>PMID:</strong> ${currentModalPaper.pmid || 'N/A'} | <strong>PMCID:</strong> ${currentModalPaper.pmcid || 'N/A'} | <strong>Country:</strong> ${currentModalPaper.country || 'N/A'}</p>
+                                </div>
+                            </div>
+
+                            <!-- Main Body Text -->
+                            <div class="prose prose-slate max-w-none">
+                                ${formattedText}
+                            </div>
+
+                            <!-- Document Footer Ruler -->
+                            <div class="border-t border-slate-200 pt-3 mt-8 text-center text-[10px] text-slate-400 font-sans">
+                                <p>© BioExtract Analytics Full-Text Retrieval Pipeline. Mapped from Pubmed Open-Access APIs.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                loader.classList.add('hidden');
+            } else {
+                // If not matched or matches PMC negative search block, render pdf file in iframe
+                renderPdfFallback();
+            }
+        }
+
+        // ================= DOWNLOAD AND FILE GENERATION CONTROLLERS =================
+        function downloadActiveSheet(key) {
+            const data = datasets[key];
+            if (!data || data.length === 0) {
+                alert("Data sheet not loaded yet.");
+                return;
+            }
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+
+            XLSX.writeFile(wb, `final_${key}_standardized_export.xlsx`);
+        }
+
+        function downloadActiveCuratedSheet() {
+            downloadActiveSheet(curatedActiveSheet);
+        }
+
+        // ================= MERMAID FLOWCHART CONTROLLERS =================
+        mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
+        let panZoomInstance = null;
+
+        function showMermaidModal(flowName) {
+            const modal = document.getElementById('mermaid-modal');
+            const container = document.getElementById('mermaid-container');
+            const title = document.getElementById('mermaid-modal-title');
+
+            if (panZoomInstance) {
+                panZoomInstance.destroy();
+                panZoomInstance = null;
+            }
+
+            title.innerText = flowName.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') + ' Workflow';
+            container.innerHTML = '<div class="flex items-center justify-center h-64"><i class="fa-solid fa-circle-notch animate-spin text-2xl text-indigo-600"></i></div>';
+            modal.classList.remove('hidden');
+
+            const filePath = `viewdata/flowcharts/${flowName}.mmd`;
+
+            fetch(filePath)
+                .then(response => {
+                    if (!response.ok) throw new Error(`Could not load flowchart file: ${response.status}`);
+                    return response.text();
+                })
+                .then(async (text) => {
+                    container.innerHTML = `<div class="mermaid w-full h-full">${text}</div>`;
+                    await mermaid.run({
+                        nodes: [container.querySelector('.mermaid')]
+                    });
+
+                    const svg = container.querySelector('svg');
+                    if (svg) {
+                        svg.removeAttribute('height');
+                        svg.style.width = '100%';
+                        svg.style.height = '100%';
+                        svg.style.maxWidth = 'none';
+
+                        panZoomInstance = svgPanZoom(svg, {
+                            zoomEnabled: true,
+                            controlIconsEnabled: true,
+                            fit: true,
+                            center: true,
+                            minZoom: 0.1,
+                            maxZoom: 10
+                        });
+                    }
+                })
+                .catch(err => {
+                    container.innerHTML = `<div class="text-rose-500 text-xs font-bold p-8 text-center bg-rose-50 rounded-xl border border-rose-100"><i class="fa-solid fa-circle-exclamation text-2xl mb-2 block"></i> Error loading flowchart:<br/>${err.message}</div>`;
+                });
+        }
+
+        function closeMermaidModal() {
+            if (panZoomInstance) {
+                panZoomInstance.destroy();
+                panZoomInstance = null;
+            }
+            document.getElementById('mermaid-modal').classList.add('hidden');
+        }
+    </script>
+</body>
+
+</html>

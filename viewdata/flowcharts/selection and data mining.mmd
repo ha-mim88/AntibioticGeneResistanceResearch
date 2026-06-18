@@ -1,0 +1,29 @@
+flowchart TD
+    subgraph DATA_MINE [1. Selection & Data Mining]
+        D1[Input Source: DOIs from Excel/JSON] --> D2{DOI available?}
+        D2 -- Yes --> D3[Fetch Metadata from CrossRef API]
+        D2 -- No --> D4[Fetch Metadata from PubMed E-Utils]
+        D3 --> D5[Extract Title, Year, Abstract, DOI]
+        D4 --> D6[Extract PMID, Title, Abstract, MeSH, Authors, Keywords]
+        D5 --> D7[Match with Reference Excel: 'India_Data_*.xlsx']
+        D6 --> D7
+        D7 --> D8[Enrich with Manual Status & EXCEL_ID]
+    end
+
+    subgraph PRE_FILT [2. Preliminary Filtering]
+        F1[Detect Human Relevance:<br/>MeSH contains 'Humans']
+        F2[Detect Geo-Location:<br/>Regex Search in Title/Abstract]
+        F3[Detect Experiment Type:<br/>Identify Clinical/Trial Indicators]
+        D8 --> F1
+        D8 --> F2
+        D8 --> F3
+    end
+
+    subgraph OUTPUT [3. Result Generation]
+        O1[Filter Errors: Missing PMIDs]
+        O2[Label Inclusion Status]
+        O3[Export to 'extractedinfo-pubmed.json']
+        F1 & F2 & F3 --> O1
+        O1 --> O2
+        O2 --> O3
+    end

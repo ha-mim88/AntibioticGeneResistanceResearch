@@ -1,0 +1,30 @@
+graph TD
+    A[Start] --> B[Load Input Articles JSON]
+    B --> C[Filter & Sort Articles]
+    C --> D{Iterate through Articles}
+    D --> E[Check: Already Processed?]
+    E -- Yes --> D
+    E -- No --> F[Check: Text Length > 100k?]
+    F -- Yes --> D
+    F -- No --> G[Cool Down Wait]
+    G --> H[Call process_research_data]
+    
+    subgraph process_research_data
+        H1[Load Source: PDF/TXT] --> H2{Text Length >= 150k?}
+        H2 -- Yes --> H3[Skip & Return Error]
+        H2 -- No --> H4{Text Length > 54k?}
+        H4 -- Yes --> H5[Split into Chunks 40k size, 2k overlap]
+        H5 --> H6[Step 1: Tree Extraction on each Chunk]
+        H6 --> H7[Combine Chunk Results]
+        H4 -- No --> H8[Step 1: Tree Extraction on Full Text]
+        H7 --> H9[Step 2: Data Extraction to JSON]
+        H8 --> H9[Step 2: Data Extraction to JSON]
+        H9 --> H10[Return Extracted Info]
+    end
+    
+    H --> I{Success?}
+    I -- Yes --> J[Save Result to Output JSON]
+    I -- No --> K[Save Error to Failed JSON]
+    J --> D
+    K --> D
+    D -- End --> L[End]

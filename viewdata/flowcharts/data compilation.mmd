@@ -1,0 +1,37 @@
+flowchart TD
+    subgraph LOAD [1. Data Loading]
+        L1[Load Curated Excels:<br/>Genes, Diseases, Antibiotics, Pathogens]
+        L2[Load Paper Metadata:<br/>extractedinfo-all-countries.xlsx]
+        L3[Load Raw Extracted Info:<br/>combined_extracted_information.json]
+    end
+
+    subgraph CUR_CLEAN [2. Curated Data Refinement]
+        C1[Filter Genes:<br/>Confidence = 'HIGH'] --> C2[Drop Unwanted Columns]
+        C3[Process Diseases:<br/>Manual Correction Override AI] --> C4[Standardize Column Names]
+        C5[Process Pathogens & Antibiotics:<br/>Rename & Save Final Versions]
+    end
+
+    subgraph JOIN_PREP [3. Join Preparation]
+        J1[Standardize IDs:<br/>Convert PMID/PMCID to String]
+        J2[Filter Metadata:<br/>HumanRelevance = 1]
+        J3[Dictionary Standardization:<br/>Normalize extracted_info Keys]
+        J4[Flatten JSON:<br/>Unpack nested dicts to columns]
+    end
+
+    subgraph MERGE [4. Dual-Key Merge Strategy]
+        M1[Attempt 1:<br/>Left Join on PMID]
+        M2[Attempt 2:<br/>Left Join on PMCID]
+        M3[Combine Results:<br/>Fill PMID-misses with PMCID-matches]
+    end
+
+    subgraph FINAL [5. Final Compilation]
+        F1[Deduplicate Columns]
+        F2[Map Original Entities to Curated Terms]
+        F3[Save Master Dataset:<br/>final_combined_extracted_data.xlsx]
+    end
+
+    LOAD --> CUR_CLEAN
+    LOAD --> JOIN_PREP
+    CUR_CLEAN --> JOIN_PREP
+    JOIN_PREP --> MERGE
+    MERGE --> FINAL
