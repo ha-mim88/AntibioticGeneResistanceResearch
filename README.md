@@ -55,6 +55,3 @@ The data presented in this explorer is the result of a complex, multi-stage AI a
 * **Mermaid.js & SVG-Pan-Zoom:** For rendering interactive, zoomable pipeline architecture flowcharts.
 * **FontAwesome:** For medical and scientific iconography.
 
-## 📬 Contact
-
-For questions regarding the methodology or data access prior to publication, please contact the primary researcher/maintainer.
