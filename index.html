@@ -54,19 +54,35 @@
 <body class="min-h-screen flex flex-col">
 
     <header
-        class="bg-slate-900 text-white shadow-md sticky top-0 z-50 px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-800">
+        class="bg-slate-900 text-white shadow-md sticky top-0 z-50 px-4 md:px-5 py-4 flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-800">
         <div class="flex items-center gap-3">
             <div class="p-2.5 bg-indigo-600 rounded-lg shadow-inner flex items-center justify-center">
                 <i class="fa-solid fa-dna text-xl text-white animate-pulse"></i>
             </div>
             <div>
-                <h1 class="text-lg font-bold tracking-tight">ARG Research: Biomedical Entity Curation & Discovery (Human
-                    Verification Ongoing)</h1>
-                <p class="text-xs text-slate-400">Validate, analyze, and compare AI Extracted and Curated Data</p>
+                <h1 class="text-lg font-bold tracking-tight">ARG Research: Biomedical Entity Curation & Discovery</h1>
+                <p class="text-xs text-slate-400">Validate, analyze, and compare AI Extracted, Curated, Antigravity AI,
+                    and Human Verified Data</p>
             </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2 text-xs">
+        <div class="flex flex-wrap items-center gap-3 text-xs">
+            <!-- Global Curation Mode Dropdown Selector -->
+            <div
+                class="flex items-center gap-2 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-full text-white shadow-inner">
+                <label for="global-curation-mode"
+                    class="text-[10px] text-slate-300 font-extrabold uppercase tracking-wider flex items-center gap-1.5">
+                    <i class="fa-solid fa-sliders text-indigo-400"></i> Active Curation Mode:
+                </label>
+                <select id="global-curation-mode" onchange="onGlobalCurationModeChange()"
+                    class="bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-indigo-300 font-extrabold focus:outline-none focus:border-indigo-500 cursor-pointer">
+                    <option value="curated">Option 1: Standard Curated</option>
+                    <option value="review1">Option 2: Auto Review1 (_review1)</option>
+                    <option value="antigravity">Option 3: Antigravity AI Correction (_antigravity_correction)</option>
+                    <option value="human_verified" selected>Option 4: Human Verified (_human_verified)</option>
+                </select>
+            </div>
+
             <div id="status-combined"
                 class="px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
@@ -81,7 +97,7 @@
     </header>
 
     <!-- Pipeline Flowchart Buttons Bar -->
-    <div class="flex flex-wrap gap-2 px-6 py-2 bg-slate-100 border-b border-slate-200">
+    <div class="flex flex-wrap gap-2 px-4 md:px-5 py-2.5 bg-slate-100 border-b border-slate-200">
         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest self-center mr-2">Pipeline
             Flowcharts:</span>
         <button onclick="showMermaidModal('selection and data mining')"
@@ -102,8 +118,8 @@
         </button>
     </div>
 
-    <!-- App Layout Container -->
-    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6 space-y-6">
+    <!-- App Layout Container (Full Width with 4/5 Padding) -->
+    <main class="flex-1 w-full p-4 md:p-5 space-y-5">
 
         <section id="upload-panel" class="hidden bg-white rounded-xl shadow-sm border border-slate-200 p-6 space-y-4">
             <div class="flex items-start gap-4">
@@ -163,6 +179,7 @@
             </div>
         </section>
 
+        <!-- Navigation Tabs -->
         <div class="flex border-b border-slate-200 flex-wrap">
             <button onclick="switchTab('analytics')" id="tab-btn-analytics"
                 class="px-5 py-3.5 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 transition flex items-center gap-2">
@@ -171,6 +188,10 @@
             <button onclick="switchTab('curated')" id="tab-btn-curated"
                 class="px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-2">
                 <i class="fa-solid fa-book-bookmark"></i> Curated Dictionaries
+            </button>
+            <button onclick="switchTab('compare')" id="tab-btn-compare"
+                class="px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-2">
+                <i class="fa-solid fa-user-check text-amber-500"></i> Compare & Human-in-the-Loop Review
             </button>
             <button onclick="switchTab('combined')" id="tab-btn-combined"
                 class="px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-2">
@@ -183,6 +204,14 @@
             <button onclick="switchTab('explorer')" id="tab-btn-explorer"
                 class="px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-2">
                 <i class="fa-solid fa-network-wired"></i> 6-Col Entity Explorer
+            </button>
+            <button onclick="switchTab('dominant')" id="tab-btn-dominant"
+                class="px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-2">
+                <i class="fa-solid fa-ranking-star"></i> Dominant Entities & Cross-Mapping
+            </button>
+            <button onclick="switchTab('dominant-stats')" id="tab-btn-dominant-stats"
+                class="px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-2">
+                <i class="fa-solid fa-table-list text-emerald-600"></i> Dominant Statistics Count
             </button>
         </div>
 
@@ -206,13 +235,13 @@
                 <div
                     class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-2 flex flex-col justify-between">
                     <div class="flex justify-between items-center text-slate-400">
-                        <span class="text-xs font-bold tracking-wider uppercase text-slate-400">Curated Entities
+                        <span class="text-xs font-bold tracking-wider uppercase text-slate-400">Active Curated
                             Map</span>
                         <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg"><i class="fa-solid fa-tag"></i></div>
                     </div>
                     <div>
                         <h3 class="text-3xl font-extrabold" id="stat-total-curations">0</h3>
-                        <p class="text-xs text-slate-500 mt-1">Known high-confidence reference elements</p>
+                        <p class="text-xs text-slate-500 mt-1" id="stat-curation-mode-label">Mode: Option 4 (Col 5: Human Verified)</p>
                     </div>
                 </div>
 
@@ -244,7 +273,7 @@
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
                     <div>
                         <h4 class="font-bold text-slate-800 text-sm">Distribution of Mapped Entity Categories</h4>
-                        <p class="text-xs text-slate-400">Reference density across curated classes</p>
+                        <p class="text-xs text-slate-400">Reference density across active curated classes</p>
                     </div>
                     <div class="h-64 relative flex items-center justify-center">
                         <canvas id="chart-entities"></canvas>
@@ -324,7 +353,12 @@
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
                 <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div>
-                        <h4 class="font-bold text-slate-800 text-base">Golden Curation Vocabulary Explorer</h4>
+                        <h4 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                            Golden Curation Vocabulary Explorer
+                            <span id="curated-mode-badge"
+                                class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">Mode:
+                                Col 2 (Curated)</span>
+                        </h4>
                         <p class="text-xs text-slate-400">Explore mappings between raw uncurated extracted entities and
                             standardized entities.</p>
                     </div>
@@ -339,8 +373,16 @@
                         <select id="curated-value-filter" onchange="filterCuratedTable()"
                             class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-indigo-500">
                             <option value="all">All Mappings</option>
-                            <option value="populated">Has Curated Value</option>
-                            <option value="empty">Empty / Unmapped Curation</option>
+                            <option value="populated">Has Active Mode Curated Value</option>
+                            <option value="empty">Empty Active Mode Curation</option>
+                            <option value="col2_has">Standard Curated: Has Value</option>
+                            <option value="col2_empty">Standard Curated: Empty</option>
+                            <option value="col3_has">Auto Review1: Has Value</option>
+                            <option value="col3_empty">Auto Review1: Empty</option>
+                            <option value="col4_has">Antigravity AI: Has Value</option>
+                            <option value="col4_empty">Antigravity AI: Empty</option>
+                            <option value="col5_has">Human Verified (_human_verified): Has Value</option>
+                            <option value="col5_empty">Human Verified (_human_verified): Empty</option>
                         </select>
                         <button onclick="downloadActiveCuratedSheet()"
                             class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold flex items-center gap-2 transition shadow-sm">
@@ -362,19 +404,24 @@
                 <!-- Custom Interactive Table -->
                 <div class="overflow-x-auto border border-slate-100 rounded-lg">
                     <table class="w-full text-left text-xs border-collapse">
-                        <thead class="bg-slate-50 text-slate-500 border-b border-slate-100 uppercase font-semibold">
+                        <thead class="bg-slate-50 text-slate-500 border-b border-slate-100 uppercase font-semibold text-[11px]">
                             <tr>
-                                <th class="p-4 w-1/2">Original Extract Target (AI output)</th>
-                                <th class="p-4 w-1/2">Curated Standard Entity</th>
+                                <th class="p-3.5 w-12 text-center">SL#</th>
+                                <th class="p-3.5 w-1/5">Original Extract Target (AI Output)</th>
+                                <th class="p-3.5 w-1/6">Standard Curated</th>
+                                <th class="p-3.5 w-1/6">Auto Review1</th>
+                                <th class="p-3.5 w-1/6 bg-purple-50/40 text-purple-900 border-l border-purple-100">Antigravity AI</th>
+                                <th class="p-3.5 w-1/5 bg-indigo-50/50 text-indigo-900 border-l border-indigo-100"><i class="fa-solid fa-user-check text-emerald-600 mr-1"></i> Human Verified (_human_verified)</th>
+                                <th class="p-3.5 w-1/6 bg-emerald-50/50 text-emerald-900 border-l border-emerald-100" id="curated-table-header-col2">Active Mode Result</th>
                             </tr>
                         </thead>
                         <tbody id="curated-table-body" class="divide-y divide-slate-100 font-medium">
                             <tr>
-                                <td colspan="2" class="p-8 text-center text-slate-400">
+                                <td colspan="7" class="p-8 text-center text-slate-400">
                                     <i class="fa-solid fa-circle-notch animate-spin text-lg mb-2 block"></i> Loading
                                     curated indices...
                                 </td>
-                            </tr>
+                                </tr>
                         </tbody>
                     </table>
                 </div>
@@ -383,6 +430,9 @@
                     class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400 pt-2 border-t border-slate-100">
                     <div class="flex flex-wrap items-center gap-3">
                         <span id="curated-pagination-info">Showing 0 - 0 of 0 mappings</span>
+                        <span id="curated-total-pages-badge"
+                            class="px-2.5 py-1 bg-indigo-50 border border-indigo-100 text-indigo-700 font-extrabold text-[11px] rounded-lg">Page
+                            1 of 1 (Total Pages: 1)</span>
                         <div class="flex items-center gap-1.5">
                             <label for="curated-items-per-page"
                                 class="text-[10px] text-slate-400 font-semibold uppercase">Show:</label>
@@ -407,6 +457,198 @@
                             class="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600 transition"><i
                                 class="fa-solid fa-chevron-left"></i></button>
                         <button onclick="changeCuratedPage(1)"
+                            class="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600 transition"><i
+                                class="fa-solid fa-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= COMPARE & HUMAN-IN-THE-LOOP REVIEW TAB CONTENT ================= -->
+        <div id="tab-content-compare" class="hidden space-y-6">
+            <!-- Executive Metrics Cards for Comparison -->
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                <div
+                    class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-2 flex flex-col justify-between">
+                    <div class="flex justify-between items-center text-slate-400">
+                        <span class="text-[10px] font-bold tracking-wider uppercase text-slate-400">Overall
+                            Agreement</span>
+                        <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><i
+                                class="fa-solid fa-circle-check"></i></div>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-extrabold text-slate-800" id="compare-stat-match-pct">0%</h3>
+                        <p class="text-xs text-slate-500 mt-1">Exact match between Col 2 & Col 3</p>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-2 flex flex-col justify-between">
+                    <div class="flex justify-between items-center text-slate-400">
+                        <span class="text-[10px] font-bold tracking-wider uppercase text-slate-400">Antigravity AI (Col
+                            4)</span>
+                        <div class="p-2 bg-purple-50 text-purple-600 rounded-lg"><i class="fa-solid fa-robot"></i></div>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-extrabold text-purple-600" id="compare-stat-antigravity-count">0</h3>
+                        <p class="text-xs text-slate-500 mt-1">Antigravity AI suggestions populated</p>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-2 flex flex-col justify-between">
+                    <div class="flex justify-between items-center text-slate-400">
+                        <span class="text-[10px] font-bold tracking-wider uppercase text-slate-400">Human Verified (Col
+                            5)</span>
+                        <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg"><i class="fa-solid fa-user-check"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-extrabold text-indigo-600" id="compare-stat-human-count">0</h3>
+                        <p class="text-xs text-slate-500 mt-1">Human-in-the-loop entries saved</p>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-2 flex flex-col justify-between">
+                    <div class="flex justify-between items-center text-slate-400">
+                        <span class="text-[10px] font-bold tracking-wider uppercase text-slate-400">Newly
+                            Excluded</span>
+                        <div class="p-2 bg-rose-50 text-rose-600 rounded-lg"><i class="fa-solid fa-filter"></i></div>
+                    </div>
+                    <div>
+                        <h3 class="text-3xl font-extrabold text-rose-600" id="compare-stat-excluded-count">0</h3>
+                        <p class="text-xs text-slate-500 mt-1">Filtered out non-entity AMR/host words</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Interactive Comparison Table & Controls -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-user-check text-indigo-600"></i> Human-in-the-Loop Curation Suite &
+                            Multi-Model Delta Comparator
+                        </h4>
+                        <p class="text-xs text-slate-400">Compare AI Extractions, Standard Curated, Auto Review1, and
+                            Antigravity AI Suggestions. 1-click accept any model into Human Verified (Col 5).</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <select id="compare-sheet-selector" onchange="renderCompareSection()"
+                            class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-indigo-500">
+                            <option value="antibiotics">Chemicals & Antibiotics</option>
+                            <option value="diseases">Diseases</option>
+                            <option value="genes">Genes</option>
+                            <option value="pathogens">Pathogens</option>
+                        </select>
+                        <select id="compare-status-filter" onchange="filterCompareTable()"
+                            class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-indigo-500">
+                            <option value="all">All Delta Mappings</option>
+                            <option value="col2_has">Standard Curated: Has Value</option>
+                            <option value="col2_empty">Standard Curated: Empty</option>
+                            <option value="col3_has">Auto Review1: Has Value</option>
+                            <option value="col3_empty">Auto Review1: Empty</option>
+                            <option value="col4_has">Antigravity AI: Has Value</option>
+                            <option value="col4_empty">Antigravity AI: Empty</option>
+                            <option value="col5_has">Human Verified (_human_verified): Has Value</option>
+                            <option value="col5_empty">Human Verified (_human_verified): Empty</option>
+                            <option value="human_saved">Human Verified Only (_human_verified Has Value)</option>
+                            <option value="antigravity_pop">Antigravity AI Populated</option>
+                            <option value="match">Exact Matches Only (Col 2 == Col 3)</option>
+                            <option value="modified">Refined / Standardized (Col 2 != Col 3)</option>
+                            <option value="excluded">Newly Excluded in Review1</option>
+                        </select>
+                        <button onclick="downloadCompareReport()"
+                            class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-semibold flex items-center gap-2 transition shadow-sm"
+                            title="Export filtered comparative matrix rows">
+                            <i class="fa-solid fa-file-export"></i> Export Delta Report
+                        </button>
+                        <button onclick="downloadFullCuratedExcel()"
+                            class="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center gap-2 transition shadow-sm"
+                            title="Download complete updated Excel dataset file containing all Column 5 Human Verified corrections">
+                            <i class="fa-solid fa-file-excel"></i> Export Updated Excel (.xlsx)
+                        </button>
+                        <button onclick="clearBrowserCorrections()"
+                            class="px-2.5 py-2 bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-700 border border-slate-200 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition"
+                            title="Clear browser storage corrections for active sheet">
+                            <i class="fa-solid fa-trash-can text-slate-400"></i> Clear Storage
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Searching input -->
+                <div class="flex flex-col sm:flex-row items-center gap-3 py-2 border-t border-slate-100">
+                    <div class="relative flex-1 w-full">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                        <input type="text" id="search-compare" oninput="filterCompareTable()"
+                            placeholder="Search terms across Original, Curated, Auto Review1, Antigravity AI, or Human Corrections..."
+                            class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+
+                <!-- Interactive Comparison & Human Input Table -->
+                <div class="overflow-x-auto border border-slate-100 rounded-lg">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead
+                            class="bg-slate-50 text-slate-500 border-b border-slate-100 uppercase font-semibold text-[11px]">
+                            <tr>
+                                <th class="p-3.5 w-12 text-center">SL#</th>
+                                <th class="p-3.5 w-1/5">Original Extract (AI)</th>
+                                <th class="p-3.5 w-1/6">Curated</th>
+                                <th class="p-3.5 w-1/6">Auto Review1</th>
+                                <th class="p-3.5 w-1/5 bg-purple-50/50 text-purple-900 border-l border-purple-100">
+                                    <i class="fa-solid fa-robot mr-1"></i> Antigravity AI Correction
+                                    (`_antigravity_correction`)
+                                </th>
+                                <th class="p-3.5 w-1/4 bg-indigo-50/50 text-indigo-900 border-l border-indigo-100">
+                                    <i class="fa-solid fa-user-pen mr-1"></i> Human In the Loop Correction (`_human_verified`)
+                                </th>
+                                <th class="p-3.5 w-1/12 text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="compare-table-body" class="divide-y divide-slate-100 font-medium">
+                            <tr>
+                                <td colspan="7" class="p-8 text-center text-slate-400">
+                                    <i class="fa-solid fa-circle-notch animate-spin text-lg mb-2 block"></i> Loading
+                                    comparative matrices...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination for Compare Section -->
+                <div
+                    class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400 pt-2 border-t border-slate-100">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span id="compare-pagination-info">Showing 0 - 0 of 0 comparative rows</span>
+                        <span id="compare-total-pages-badge"
+                            class="px-2.5 py-1 bg-indigo-50 border border-indigo-100 text-indigo-700 font-extrabold text-[11px] rounded-lg">Page
+                            1 of 1 (Total Pages: 1)</span>
+                        <div class="flex items-center gap-1.5">
+                            <label for="compare-items-per-page"
+                                class="text-[10px] text-slate-400 font-semibold uppercase">Show:</label>
+                            <select id="compare-items-per-page" onchange="changeComparePageSize(this.value)"
+                                class="bg-slate-50 border border-slate-200 rounded px-1.5 py-0.5 text-[11px] focus:outline-none focus:border-indigo-500">
+                                <option value="5">5</option>
+                                <option value="10">10</option>
+                                <option value="25" selected>25</option>
+                                <option value="50">50</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-1.5">
+                            <label for="compare-goto-page" class="text-[10px] text-slate-400 font-semibold uppercase">Go
+                                to page:</label>
+                            <input type="number" id="compare-goto-page" min="1" oninput="jumpToComparePage(this.value)"
+                                class="w-12 bg-slate-50 border border-slate-200 rounded px-1 text-center text-[11px] focus:outline-none focus:border-indigo-500">
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button onclick="changeComparePage(-1)"
+                            class="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600 transition"><i
+                                class="fa-solid fa-chevron-left"></i></button>
+                        <button onclick="changeComparePage(1)"
                             class="p-2 border border-slate-200 rounded-lg hover:bg-slate-50 text-slate-600 transition"><i
                                 class="fa-solid fa-chevron-right"></i></button>
                     </div>
@@ -568,8 +810,8 @@
                                     </div>
                                     <div
                                         class="p-2.5 bg-emerald-50/30 border border-emerald-100 rounded-lg min-h-[48px]">
-                                        <span
-                                            class="text-[8px] uppercase font-bold text-emerald-600 block mb-1">Curated</span>
+                                        <span class="text-[8px] uppercase font-bold text-emerald-600 block mb-1"
+                                            id="inspect-curated-genes-label">Curated</span>
                                         <div id="inspect-curated-genes" class="flex flex-wrap gap-1"></div>
                                     </div>
                                 </div>
@@ -587,8 +829,8 @@
                                     </div>
                                     <div
                                         class="p-2.5 bg-emerald-50/30 border border-emerald-100 rounded-lg min-h-[48px]">
-                                        <span
-                                            class="text-[8px] uppercase font-bold text-emerald-600 block mb-1">Curated</span>
+                                        <span class="text-[8px] uppercase font-bold text-emerald-600 block mb-1"
+                                            id="inspect-curated-diseases-label">Curated</span>
                                         <div id="inspect-curated-diseases" class="flex flex-wrap gap-1"></div>
                                     </div>
                                 </div>
@@ -606,8 +848,8 @@
                                     </div>
                                     <div
                                         class="p-2.5 bg-emerald-50/30 border border-emerald-100 rounded-lg min-h-[48px]">
-                                        <span
-                                            class="text-[8px] uppercase font-bold text-emerald-600 block mb-1">Curated</span>
+                                        <span class="text-[8px] uppercase font-bold text-emerald-600 block mb-1"
+                                            id="inspect-curated-pathogens-label">Curated</span>
                                         <div id="inspect-curated-pathogens" class="flex flex-wrap gap-1"></div>
                                     </div>
                                 </div>
@@ -625,8 +867,8 @@
                                     </div>
                                     <div
                                         class="p-2.5 bg-emerald-50/30 border border-emerald-100 rounded-lg min-h-[48px]">
-                                        <span
-                                            class="text-[8px] uppercase font-bold text-emerald-600 block mb-1">Curated</span>
+                                        <span class="text-[8px] uppercase font-bold text-emerald-600 block mb-1"
+                                            id="inspect-curated-antibiotics-label">Curated</span>
                                         <div id="inspect-curated-antibiotics" class="flex flex-wrap gap-1"></div>
                                     </div>
                                 </div>
@@ -842,6 +1084,372 @@
             </div>
         </div>
 
+        <!-- ================= DOMINANT ENTITIES & CROSS-MAPPING TAB CONTENT ================= -->
+        <div id="tab-content-dominant" class="hidden space-y-6">
+            <!-- Control Bar -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-ranking-star text-indigo-600"></i> Dominant Biomedical Entities &
+                            Cross-Entity Associations
+                        </h4>
+                        <p class="text-xs text-slate-400">Discover top-ranking Genes, Pathogens, Diseases, and
+                            Antibiotics by publication frequency. Click any entity to inspect co-occurring related
+                            artifacts and source literature.</p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <div class="flex items-center gap-2">
+                            <label for="dominant-filter-country"
+                                class="text-xs font-bold text-slate-600 flex items-center gap-1">
+                                <i class="fa-solid fa-globe text-purple-600"></i> Country Scope:
+                            </label>
+                            <select id="dominant-filter-country" onchange="renderDominantInterface()"
+                                class="px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none focus:border-indigo-500">
+                                <option value="">All Countries (Default)</option>
+                            </select>
+                        </div>
+                        <button onclick="resetDominantSelection()"
+                            class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition">
+                            <i class="fa-solid fa-rotate-left"></i> Reset Selection
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 4 Columns Grid: Dominant Rankings -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+                    <!-- Column 1: Dominant Genes -->
+                    <div class="bg-emerald-50/30 rounded-xl p-4 border border-emerald-100 flex flex-col h-[380px]">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-emerald-800 text-xs uppercase flex items-center gap-1.5"><i
+                                    class="fa-solid fa-dna"></i> Top Genes</span>
+                            <span id="badge-count-gene"
+                                class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800">0</span>
+                        </div>
+                        <input type="text" id="dominant-search-gene" oninput="filterDominantColumns('gene')"
+                            placeholder="Search genes..."
+                            class="w-full mb-2.5 px-2.5 py-1.5 bg-white border border-emerald-200 rounded-lg text-xs focus:outline-none focus:border-emerald-500">
+                        <div id="dominant-genes-list" class="flex-1 overflow-y-auto space-y-1.5 text-xs pr-1"></div>
+                    </div>
+
+                    <!-- Column 2: Dominant Pathogens -->
+                    <div class="bg-blue-50/30 rounded-xl p-4 border border-blue-100 flex flex-col h-[380px]">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-blue-800 text-xs uppercase flex items-center gap-1.5"><i
+                                    class="fa-solid fa-bacteria"></i> Top Pathogens</span>
+                            <span id="badge-count-pathogen"
+                                class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800">0</span>
+                        </div>
+                        <input type="text" id="dominant-search-pathogen" oninput="filterDominantColumns('pathogen')"
+                            placeholder="Search pathogens..."
+                            class="w-full mb-2.5 px-2.5 py-1.5 bg-white border border-blue-200 rounded-lg text-xs focus:outline-none focus:border-blue-500">
+                        <div id="dominant-pathogens-list" class="flex-1 overflow-y-auto space-y-1.5 text-xs pr-1"></div>
+                    </div>
+
+                    <!-- Column 3: Dominant Diseases -->
+                    <div class="bg-rose-50/30 rounded-xl p-4 border border-rose-100 flex flex-col h-[380px]">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-rose-800 text-xs uppercase flex items-center gap-1.5"><i
+                                    class="fa-solid fa-heart-crack"></i> Top Diseases</span>
+                            <span id="badge-count-disease"
+                                class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800">0</span>
+                        </div>
+                        <input type="text" id="dominant-search-disease" oninput="filterDominantColumns('disease')"
+                            placeholder="Search diseases..."
+                            class="w-full mb-2.5 px-2.5 py-1.5 bg-white border border-rose-200 rounded-lg text-xs focus:outline-none focus:border-rose-500">
+                        <div id="dominant-diseases-list" class="flex-1 overflow-y-auto space-y-1.5 text-xs pr-1"></div>
+                    </div>
+
+                    <!-- Column 4: Dominant Antibiotics -->
+                    <div class="bg-amber-50/30 rounded-xl p-4 border border-amber-100 flex flex-col h-[380px]">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-amber-800 text-xs uppercase flex items-center gap-1.5"><i
+                                    class="fa-solid fa-capsules"></i> Top Antibiotics</span>
+                            <span id="badge-count-antibiotic"
+                                class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">0</span>
+                        </div>
+                        <input type="text" id="dominant-search-antibiotic" oninput="filterDominantColumns('antibiotic')"
+                            placeholder="Search antibiotics..."
+                            class="w-full mb-2.5 px-2.5 py-1.5 bg-white border border-amber-200 rounded-lg text-xs focus:outline-none focus:border-amber-500">
+                        <div id="dominant-antibiotics-list" class="flex-1 overflow-y-auto space-y-1.5 text-xs pr-1">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interactive Cross-Entity Mapping & Source Literature Panel -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-5">
+                <div
+                    class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-base flex items-center gap-2">
+                            <i class="fa-solid fa-diagram-project text-indigo-600"></i> Interactive Cross-Entity
+                            Associations & Respective Papers
+                        </h4>
+                        <p class="text-xs text-slate-400">Select any dominant item above to view its co-occurring
+                            related artifacts and matching research publications.</p>
+                    </div>
+                    <div id="dominant-selection-banner"
+                        class="px-3 py-1.5 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-800 text-xs font-semibold flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                        <span>Active Selection: Overview (No Entity Selected)</span>
+                    </div>
+                </div>
+
+                <!-- Related Artifacts Co-occurrence Grid (4 Mini Cards) -->
+                <div class="space-y-2">
+                    <span
+                        class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                        <i class="fa-solid fa-link text-indigo-500"></i> Co-Occurring Related Artifacts in Cohort
+                    </span>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <!-- Related Genes -->
+                        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+                            <span class="font-bold text-emerald-800 text-[11px] uppercase flex items-center gap-1"><i
+                                    class="fa-solid fa-dna"></i> Related Genes</span>
+                            <div id="dominant-related-genes"
+                                class="flex flex-wrap gap-1 max-h-36 overflow-y-auto pr-1 text-[11px]">
+                                <span class="text-slate-400 italic text-[10px]">Select an entity above to map related
+                                    genes.</span>
+                            </div>
+                        </div>
+
+                        <!-- Related Pathogens -->
+                        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+                            <span class="font-bold text-blue-800 text-[11px] uppercase flex items-center gap-1"><i
+                                    class="fa-solid fa-bacteria"></i> Related Pathogens</span>
+                            <div id="dominant-related-pathogens"
+                                class="flex flex-wrap gap-1 max-h-36 overflow-y-auto pr-1 text-[11px]">
+                                <span class="text-slate-400 italic text-[10px]">Select an entity above to map related
+                                    pathogens.</span>
+                            </div>
+                        </div>
+
+                        <!-- Related Diseases -->
+                        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+                            <span class="font-bold text-rose-800 text-[11px] uppercase flex items-center gap-1"><i
+                                    class="fa-solid fa-heart-crack"></i> Related Diseases</span>
+                            <div id="dominant-related-diseases"
+                                class="flex flex-wrap gap-1 max-h-36 overflow-y-auto pr-1 text-[11px]">
+                                <span class="text-slate-400 italic text-[10px]">Select an entity above to map related
+                                    diseases.</span>
+                            </div>
+                        </div>
+
+                        <!-- Related Antibiotics -->
+                        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200/80 space-y-2">
+                            <span class="font-bold text-amber-800 text-[11px] uppercase flex items-center gap-1"><i
+                                    class="fa-solid fa-capsules"></i> Related Antibiotics</span>
+                            <div id="dominant-related-antibiotics"
+                                class="flex flex-wrap gap-1 max-h-36 overflow-y-auto pr-1 text-[11px]">
+                                <span class="text-slate-400 italic text-[10px]">Select an entity above to map related
+                                    antibiotics.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Respective Source Papers Panel -->
+                <div class="space-y-3 pt-2">
+                    <div class="flex justify-between items-center">
+                        <span
+                            class="text-xs font-extrabold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                            <i class="fa-solid fa-newspaper text-indigo-500"></i> Respective Source Research Papers
+                        </span>
+                        <span id="dominant-papers-count-badge"
+                            class="px-2.5 py-0.5 bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold rounded-lg">0
+                            Papers</span>
+                    </div>
+
+                    <div id="dominant-papers-placeholder"
+                        class="py-12 text-center text-slate-400 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+                        <i class="fa-solid fa-hand-pointer text-3xl text-slate-300 mb-2 block"></i>
+                        <span class="text-xs font-semibold text-slate-500 block">No Active Entity Selected</span>
+                        <span class="text-[10px] text-slate-400">Click any dominant entity card above to display
+                            corresponding source publications.</span>
+                    </div>
+
+                    <div id="dominant-papers-grid"
+                        class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5 max-h-[480px] overflow-y-auto pr-1">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= DOMINANT STATISTICS COUNT TAB CONTENT ================= -->
+        <div id="tab-content-dominant-stats" class="hidden space-y-6">
+            <!-- Top Controls Header Card -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                        <h3 class="text-base font-extrabold text-slate-800 flex items-center gap-2">
+                            <i class="fa-solid fa-table-list text-emerald-600"></i> Dominant Statistics Count
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1">
+                            Distinct occurrence count distribution tables for Genes, Pathogens, Diseases, and Antibiotics (First Column: Distinct Count, Second Column: Comma-Separated Values).
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3 text-xs">
+                        <span id="dominant-stats-curation-badge" class="px-2.5 py-1 rounded-md bg-indigo-50 text-indigo-800 border border-indigo-200 font-bold text-xs flex items-center">
+                            <i class="fa-solid fa-user-check text-emerald-600 mr-1"></i> Active Source: Option 4 (Human Verified: _human_verified)
+                        </span>
+                        <div class="flex items-center gap-2">
+                            <label for="dominant-stats-filter-country" class="font-bold text-slate-600 text-xs">Country Filter:</label>
+                            <select id="dominant-stats-filter-country" onchange="renderDominantStatsInterface()"
+                                class="bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-700 font-semibold focus:outline-none focus:border-indigo-500 cursor-pointer">
+                                <option value="">All Countries (Default)</option>
+                            </select>
+                        </div>
+                        <button onclick="exportDominantStatsExcel()"
+                            class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold text-xs flex items-center gap-1.5 shadow-sm transition">
+                            <i class="fa-solid fa-file-excel"></i> Export All Tables (Excel)
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Global Search & Stats Summary -->
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                    <div class="relative w-full sm:w-80">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                        <input type="text" id="dominant-stats-search" oninput="filterDominantStatsTables()"
+                            placeholder="Filter values or counts across tables..."
+                            class="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs focus:outline-none focus:border-indigo-500">
+                    </div>
+                    <div class="flex items-center gap-3 text-xs font-semibold">
+                        <span class="px-2.5 py-1 rounded-md bg-emerald-50 text-emerald-700 border border-emerald-200" id="stats-summary-genes">Genes: 0 Groups</span>
+                        <span class="px-2.5 py-1 rounded-md bg-blue-50 text-blue-700 border border-blue-200" id="stats-summary-pathogens">Pathogens: 0 Groups</span>
+                        <span class="px-2.5 py-1 rounded-md bg-rose-50 text-rose-700 border border-rose-200" id="stats-summary-diseases">Diseases: 0 Groups</span>
+                        <span class="px-2.5 py-1 rounded-md bg-amber-50 text-amber-700 border border-amber-200" id="stats-summary-antibiotics">Antibiotics: 0 Groups</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4 Tables Grid Layout (2x2 Grid) -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+                <!-- Table 1: Genes Dominant Statistics Count -->
+                <div class="bg-white rounded-xl shadow-sm border border-emerald-200/80 overflow-hidden flex flex-col">
+                    <div class="bg-gradient-to-r from-emerald-600 to-teal-700 text-white px-5 py-3.5 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-dna text-lg"></i>
+                            <h4 class="font-extrabold text-sm tracking-wide">1. Genes Dominant Statistics Count</h4>
+                        </div>
+                        <span id="badge-stats-genes" class="px-2.5 py-0.5 rounded-full bg-white/20 text-white font-bold text-xs">0 Distinct Entities</span>
+                    </div>
+                    <div class="p-3 bg-emerald-50/40 border-b border-emerald-100 flex justify-between items-center text-xs">
+                        <span class="text-emerald-800 font-medium">Sorted by Distinct Count (Descending)</span>
+                        <button onclick="copyTableCSV('genes')" class="text-[11px] text-emerald-700 hover:text-emerald-900 font-bold flex items-center gap-1">
+                            <i class="fa-regular fa-copy"></i> Copy CSV
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto max-h-[420px] overflow-y-auto flex-1">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
+                                <tr>
+                                    <th class="py-2.5 px-4 w-36 border-r border-slate-200 text-center">Distinct Count</th>
+                                    <th class="py-2.5 px-4">Comma Separated Values</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dominant-stats-table-genes-body" class="divide-y divide-slate-100 font-medium">
+                                <tr><td colspan="2" class="p-6 text-center text-slate-400 italic">Loading statistics...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Table 2: Pathogens Dominant Statistics Count -->
+                <div class="bg-white rounded-xl shadow-sm border border-blue-200/80 overflow-hidden flex flex-col">
+                    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-5 py-3.5 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-bacteria text-lg"></i>
+                            <h4 class="font-extrabold text-sm tracking-wide">2. Pathogens Dominant Statistics Count</h4>
+                        </div>
+                        <span id="badge-stats-pathogens" class="px-2.5 py-0.5 rounded-full bg-white/20 text-white font-bold text-xs">0 Distinct Entities</span>
+                    </div>
+                    <div class="p-3 bg-blue-50/40 border-b border-blue-100 flex justify-between items-center text-xs">
+                        <span class="text-blue-800 font-medium">Sorted by Distinct Count (Descending)</span>
+                        <button onclick="copyTableCSV('pathogens')" class="text-[11px] text-blue-700 hover:text-blue-900 font-bold flex items-center gap-1">
+                            <i class="fa-regular fa-copy"></i> Copy CSV
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto max-h-[420px] overflow-y-auto flex-1">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
+                                <tr>
+                                    <th class="py-2.5 px-4 w-36 border-r border-slate-200 text-center">Distinct Count</th>
+                                    <th class="py-2.5 px-4">Comma Separated Values</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dominant-stats-table-pathogens-body" class="divide-y divide-slate-100 font-medium">
+                                <tr><td colspan="2" class="p-6 text-center text-slate-400 italic">Loading statistics...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Table 3: Diseases Dominant Statistics Count -->
+                <div class="bg-white rounded-xl shadow-sm border border-rose-200/80 overflow-hidden flex flex-col">
+                    <div class="bg-gradient-to-r from-rose-600 to-pink-700 text-white px-5 py-3.5 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-heart-crack text-lg"></i>
+                            <h4 class="font-extrabold text-sm tracking-wide">3. Diseases Dominant Statistics Count</h4>
+                        </div>
+                        <span id="badge-stats-diseases" class="px-2.5 py-0.5 rounded-full bg-white/20 text-white font-bold text-xs">0 Distinct Entities</span>
+                    </div>
+                    <div class="p-3 bg-rose-50/40 border-b border-rose-100 flex justify-between items-center text-xs">
+                        <span class="text-rose-800 font-medium">Sorted by Distinct Count (Descending)</span>
+                        <button onclick="copyTableCSV('diseases')" class="text-[11px] text-rose-700 hover:text-rose-900 font-bold flex items-center gap-1">
+                            <i class="fa-regular fa-copy"></i> Copy CSV
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto max-h-[420px] overflow-y-auto flex-1">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
+                                <tr>
+                                    <th class="py-2.5 px-4 w-36 border-r border-slate-200 text-center">Distinct Count</th>
+                                    <th class="py-2.5 px-4">Comma Separated Values</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dominant-stats-table-diseases-body" class="divide-y divide-slate-100 font-medium">
+                                <tr><td colspan="2" class="p-6 text-center text-slate-400 italic">Loading statistics...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Table 4: Antibiotics Dominant Statistics Count -->
+                <div class="bg-white rounded-xl shadow-sm border border-amber-200/80 overflow-hidden flex flex-col">
+                    <div class="bg-gradient-to-r from-amber-600 to-yellow-600 text-white px-5 py-3.5 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-capsules text-lg"></i>
+                            <h4 class="font-extrabold text-sm tracking-wide">4. Antibiotics Dominant Statistics Count</h4>
+                        </div>
+                        <span id="badge-stats-antibiotics" class="px-2.5 py-0.5 rounded-full bg-white/20 text-white font-bold text-xs">0 Distinct Entities</span>
+                    </div>
+                    <div class="p-3 bg-amber-50/40 border-b border-amber-100 flex justify-between items-center text-xs">
+                        <span class="text-amber-800 font-medium">Sorted by Distinct Count (Descending)</span>
+                        <button onclick="copyTableCSV('antibiotics')" class="text-[11px] text-amber-700 hover:text-amber-900 font-bold flex items-center gap-1">
+                            <i class="fa-regular fa-copy"></i> Copy CSV
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto max-h-[420px] overflow-y-auto flex-1">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead class="bg-slate-100 text-slate-700 font-bold sticky top-0 border-b border-slate-200">
+                                <tr>
+                                    <th class="py-2.5 px-4 w-36 border-r border-slate-200 text-center">Distinct Count</th>
+                                    <th class="py-2.5 px-4">Comma Separated Values</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dominant-stats-table-antibiotics-body" class="divide-y divide-slate-100 font-medium">
+                                <tr><td colspan="2" class="p-6 text-center text-slate-400 italic">Loading statistics...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
     </main>
 
     <!-- Detailed Full Text / PDF Viewer Modal Overlay -->
@@ -1008,6 +1616,9 @@
             pathogens: []
         };
 
+        // Global Curation Mode State: 'curated' (Col 2), 'review1' (Col 3), 'antigravity' (Col 4), or 'human_verified' (Col 5)
+        let globalCurationMode = 'human_verified';
+
         // Cache for fulltext documents JSON to prevent repetitive large fetching
         let fulltextArticlesCache = null;
 
@@ -1019,6 +1630,13 @@
         let curatedPage = 1;
         let curatedPageSize = 10;
         let curatedSearchFilteredData = [];
+
+        // Compare Section State
+        let compareActiveSheet = 'antibiotics';
+        let compareStatusFilter = 'all';
+        let comparePage = 1;
+        let comparePageSize = 25;
+        let compareSearchFilteredData = [];
 
         let papersPage = 1;
         let papersPageSize = 8;
@@ -1045,14 +1663,106 @@
         // Auto Load Excel Assets Direct Maps
         const fileUrls = {
             combined: 'final_combined_extracted_data.xlsx',
-            antibiotics: 'final_antibiotics_curated.xlsx',
-            diseases: 'final_diseases_curated.xlsx',
-            genes: 'final_genes_curated.xlsx',
-            pathogens: 'final_pathogens_curated.xlsx'
+            antibiotics: 'final_antibiotics_curated_updated.xlsx',
+            diseases: 'final_diseases_curated_updated.xlsx',
+            genes: 'final_genes_curated_updated.xlsx',
+            pathogens: 'final_pathogens_curated_updated.xlsx'
         };
+
+        // ================= LOCALSTORAGE PERSISTENCE CONTROLLERS (PURE HTML / STATIC MODE) =================
+        const LOCAL_STORAGE_CORRECTIONS_KEY = 'arg_research_human_corrections_v1';
+
+        function getStoredCorrections() {
+            try {
+                const raw = localStorage.getItem(LOCAL_STORAGE_CORRECTIONS_KEY);
+                return raw ? JSON.parse(raw) : {};
+            } catch (e) {
+                console.warn("Failed to read from localStorage:", e);
+                return {};
+            }
+        }
+
+        function saveCorrectionToStorage(sheet, origText, humanVal, timestamp) {
+            try {
+                const stored = getStoredCorrections();
+                if (!stored[sheet]) stored[sheet] = {};
+                stored[sheet][origText] = {
+                    val: humanVal,
+                    ts: timestamp || Math.floor(Date.now() / 1000)
+                };
+                localStorage.setItem(LOCAL_STORAGE_CORRECTIONS_KEY, JSON.stringify(stored));
+            } catch (e) {
+                console.warn("Failed to save to localStorage:", e);
+            }
+        }
+
+        // Helper: Robustly resolves column keys regardless of dataset field ordering or suffix variations
+        function getHumanVerifiedColKey(rowOrKeys) {
+            if (!rowOrKeys) return null;
+            const keys = Array.isArray(rowOrKeys) ? rowOrKeys : Object.keys(rowOrKeys);
+            if (!keys || keys.length === 0) return null;
+            return keys.find(k => k.endsWith('_human_verified')) ||
+                   keys.find(k => k.includes('human_verified') && !k.endsWith('_updated_at') && !k.startsWith('_p_')) ||
+                   null;
+        }
+
+        function getAntigravityColKey(rowOrKeys) {
+            if (!rowOrKeys) return null;
+            const keys = Array.isArray(rowOrKeys) ? rowOrKeys : Object.keys(rowOrKeys);
+            if (!keys || keys.length === 0) return null;
+            return keys.find(k => k.includes('antigravity')) || null;
+        }
+
+        function getReview1ColKey(rowOrKeys) {
+            if (!rowOrKeys) return null;
+            const keys = Array.isArray(rowOrKeys) ? rowOrKeys : Object.keys(rowOrKeys);
+            if (!keys || keys.length === 0) return null;
+            return keys.find(k => k.includes('review1')) || (keys.length >= 3 ? keys[2] : keys[1]);
+        }
+
+        // Performance Lookup Cache for O(1) paper entity resolutions
+        let entityLookupMapCache = {};
+
+        function invalidateEntityLookupCache() {
+            entityLookupMapCache = {};
+        }
+
+        function applyStoredCorrectionsToDataset(sheet) {
+            const stored = getStoredCorrections();
+            const sheetStored = stored[sheet];
+            if (!sheetStored || !datasets[sheet] || datasets[sheet].length === 0) return;
+
+            const activeData = datasets[sheet];
+            const keys = Object.keys(activeData[0]);
+            const colSingular = sheet.endsWith('s') ? sheet.slice(0, -1) : sheet;
+            const col4Name = getHumanVerifiedColKey(keys) || `curated_${colSingular}_human_verified`;
+
+            activeData.forEach(row => {
+                const origText = String(row[keys[0]] || '').trim();
+                if (sheetStored[origText]) {
+                    const entry = sheetStored[origText];
+                    row[col4Name] = entry.val;
+                    row.human_verified_updated_at = entry.ts;
+                }
+            });
+        }
+
+        function clearBrowserCorrections(sheet = compareActiveSheet) {
+            if (!confirm(`Are you sure you want to clear browser-stored corrections for '${sheet}'?`)) return;
+            try {
+                const stored = getStoredCorrections();
+                delete stored[sheet];
+                localStorage.setItem(LOCAL_STORAGE_CORRECTIONS_KEY, JSON.stringify(stored));
+                alert(`Cleared browser storage for '${sheet}'. Reloading dataset...`);
+                initAutoLoading();
+            } catch (e) {
+                console.error("Error clearing localStorage:", e);
+            }
+        }
 
         // Run boot loops
         window.addEventListener('DOMContentLoaded', () => {
+            onGlobalCurationModeChange();
             initAutoLoading();
             initManualUploadListeners();
 
@@ -1061,6 +1771,167 @@
                 if (e.key === 'Escape') closePaperModal();
             });
         });
+
+        // Global Curation Mode Selector Change Handler
+        function onGlobalCurationModeChange() {
+            const select = document.getElementById('global-curation-mode');
+            if (select) {
+                globalCurationMode = select.value;
+            }
+
+            invalidateEntityLookupCache();
+
+            // Update labels & badges across tabs
+            const modeBadge = document.getElementById('curated-mode-badge');
+            if (modeBadge) {
+                if (globalCurationMode === 'human_verified') {
+                    modeBadge.innerText = 'Mode: Human Verified (_human_verified)';
+                } else if (globalCurationMode === 'antigravity') {
+                    modeBadge.innerText = 'Mode: Antigravity AI (_antigravity_correction)';
+                } else if (globalCurationMode === 'review1') {
+                    modeBadge.innerText = 'Mode: Auto Review1 (_review1)';
+                } else {
+                    modeBadge.innerText = 'Mode: Standard Curated';
+                }
+            }
+
+            const headerCol2 = document.getElementById('curated-table-header-col2');
+            if (headerCol2) {
+                if (globalCurationMode === 'human_verified') {
+                    headerCol2.innerText = 'Active Result: Option 4 (Human Verified)';
+                } else if (globalCurationMode === 'antigravity') {
+                    headerCol2.innerText = 'Active Result: Option 3 (Antigravity AI)';
+                } else if (globalCurationMode === 'review1') {
+                    headerCol2.innerText = 'Active Result: Option 2 (Auto Review1)';
+                } else {
+                    headerCol2.innerText = 'Active Result: Option 1 (Standard Curated)';
+                }
+            }
+
+            const statModeLabel = document.getElementById('stat-curation-mode-label');
+            if (statModeLabel) {
+                if (globalCurationMode === 'human_verified') {
+                    statModeLabel.innerText = 'Mode: Option 4 (Human Verified: _human_verified)';
+                } else if (globalCurationMode === 'antigravity') {
+                    statModeLabel.innerText = 'Mode: Option 3 (Antigravity AI)';
+                } else if (globalCurationMode === 'review1') {
+                    statModeLabel.innerText = 'Mode: Option 2 (Auto Review1)';
+                } else {
+                    statModeLabel.innerText = 'Mode: Option 1 (Standard Curated)';
+                }
+            }
+
+            const domStatsBadge = document.getElementById('dominant-stats-curation-badge');
+            if (domStatsBadge) {
+                if (globalCurationMode === 'human_verified') {
+                    domStatsBadge.innerHTML = `<i class="fa-solid fa-user-check text-emerald-600 mr-1"></i> Active Source: Option 4 (Human Verified: _human_verified)`;
+                } else if (globalCurationMode === 'antigravity') {
+                    domStatsBadge.innerHTML = `<i class="fa-solid fa-wand-magic-sparkles text-purple-600 mr-1"></i> Active Source: Option 3 (Antigravity AI)`;
+                } else if (globalCurationMode === 'review1') {
+                    domStatsBadge.innerHTML = `<i class="fa-solid fa-robot text-blue-600 mr-1"></i> Active Source: Option 2 (Auto Review1)`;
+                } else {
+                    domStatsBadge.innerHTML = `<i class="fa-solid fa-list-check text-slate-600 mr-1"></i> Active Source: Option 1 (Standard Curated)`;
+                }
+            }
+
+            processDataStateAndRender();
+        }
+
+        // Helper: Resolves active curated value from a dataset row based on globalCurationMode
+        function getCuratedValueFromRow(row) {
+            if (!row) return '';
+            const keys = Object.keys(row);
+            if (keys.length < 2) return '';
+
+            if (globalCurationMode === 'human_verified') {
+                const colHuman = getHumanVerifiedColKey(keys);
+                if (colHuman && row[colHuman] !== undefined && row[colHuman] !== null) {
+                    const hVal = String(row[colHuman]).trim();
+                    if (hVal && hVal.toLowerCase() !== 'nan') return hVal;
+                }
+                const colAG = getAntigravityColKey(keys);
+                if (colAG && row[colAG] !== undefined && row[colAG] !== null) {
+                    const agVal = String(row[colAG]).trim();
+                    if (agVal && agVal.toLowerCase() !== 'nan') return agVal;
+                }
+                const colReview1 = getReview1ColKey(keys);
+                if (colReview1 && row[colReview1] !== undefined && row[colReview1] !== null) {
+                    const rVal = String(row[colReview1]).trim();
+                    if (rVal && rVal.toLowerCase() !== 'nan') return rVal;
+                }
+                return String(row[keys[1]] || '').trim();
+            }
+
+            if (globalCurationMode === 'antigravity') {
+                const colAG = getAntigravityColKey(keys);
+                if (colAG && row[colAG] !== undefined && row[colAG] !== null) {
+                    const agVal = String(row[colAG]).trim();
+                    if (agVal && agVal.toLowerCase() !== 'nan') return agVal;
+                }
+                const colReview1 = getReview1ColKey(keys);
+                if (colReview1 && row[colReview1] !== undefined && row[colReview1] !== null) {
+                    const rVal = String(row[colReview1]).trim();
+                    if (rVal && rVal.toLowerCase() !== 'nan') return rVal;
+                }
+                return String(row[keys[1]] || '').trim();
+            }
+
+            if (globalCurationMode === 'review1') {
+                const colReview1 = getReview1ColKey(keys);
+                if (colReview1 && row[colReview1] !== undefined && row[colReview1] !== null) {
+                    const val = row[colReview1];
+                    return (val !== undefined && val !== null) ? String(val) : '';
+                }
+            }
+
+            const val = row[keys[1]];
+            return (val !== undefined && val !== null) ? String(val) : '';
+        }
+
+        // Helper: Returns active curated entity list for a paper dynamically with O(1) map caching
+        function getActiveCuratedEntitiesForPaper(p, entityType) {
+            const curCol = `curated_${entityType}`;
+
+            if (globalCurationMode === 'curated') {
+                return parseListField(p[curCol]);
+            }
+
+            const cacheKey = `${entityType}_${globalCurationMode}`;
+            if (!entityLookupMapCache[cacheKey]) {
+                const sheetData = datasets[entityType] || [];
+                if (sheetData.length > 0) {
+                    const keys = Object.keys(sheetData[0]);
+                    const origKey = keys[0];
+
+                    const map = new Map();
+                    sheetData.forEach(r => {
+                        const orig = String(r[origKey] || '').trim().toLowerCase();
+                        let val = getCuratedValueFromRow(r);
+                        if (orig) map.set(orig, val);
+                    });
+                    entityLookupMapCache[cacheKey] = map;
+                } else {
+                    entityLookupMapCache[cacheKey] = new Map();
+                }
+            }
+
+            const map = entityLookupMapCache[cacheKey];
+            const extCol = `extracted_${entityType === 'antibiotics' ? 'chemicals' : entityType}`;
+            const extracted = parseListField(p[extCol]);
+
+            if (extracted.length > 0 && map && map.size > 0) {
+                const resolved = [];
+                extracted.forEach(item => {
+                    const match = map.get(item.toLowerCase());
+                    if (match && match !== 'nan' && match.trim() !== '') {
+                        resolved.push(...match.split(',').map(s => s.trim()).filter(Boolean));
+                    }
+                });
+                if (resolved.length > 0) return Array.from(new Set(resolved));
+            }
+
+            return parseListField(p[curCol]);
+        }
 
         // Compute pmcid_pmid row keys dynamically
         function sanitizeAndSetIdentifier(p) {
@@ -1089,6 +1960,7 @@
                         rows.forEach(p => sanitizeAndSetIdentifier(p));
                     }
                     datasets[key] = rows;
+                    applyStoredCorrectionsToDataset(key);
 
                     updateLoadStatus(key, true);
                     loadedSuccessfullyCount++;
@@ -1124,6 +1996,7 @@
                                     rows.forEach(p => sanitizeAndSetIdentifier(p));
                                 }
                                 datasets[key] = rows;
+                                applyStoredCorrectionsToDataset(key);
                                 updateLoadStatus(key, true);
                                 processDataStateAndRender();
                             };
@@ -1159,7 +2032,7 @@
                 combinedBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Combined: ${datasets.combined.length} Papers</span>`;
             } else {
                 combinedBadge.className = "px-3 py-1.5 rounded-full bg-rose-50 text-rose-700 border border-rose-200 flex items-center gap-2";
-                combinedBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500 animate-pulse"></span><span>Combined Data Missing</span>`;
+                combinedBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span><span>Combined Data Missing</span>`;
             }
 
             curatedBadge.className = loadedCurations === 4 ?
@@ -1170,21 +2043,29 @@
 
         function switchTab(tabId) {
             currentTab = tabId;
-            const tabs = ['analytics', 'curated', 'combined', 'mapping', 'explorer'];
+            const tabs = ['analytics', 'curated', 'compare', 'combined', 'mapping', 'explorer', 'dominant', 'dominant-stats'];
             tabs.forEach(t => {
                 const btn = document.getElementById(`tab-btn-${t}`);
                 const content = document.getElementById(`tab-content-${t}`);
-                if (t === tabId) {
-                    btn.className = "px-5 py-3.5 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 transition flex items-center gap-2";
-                    content.classList.remove('hidden');
-                } else {
-                    btn.className = "px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-2";
-                    content.classList.add('hidden');
+                if (btn && content) {
+                    if (t === tabId) {
+                        btn.className = "px-5 py-3.5 text-sm font-semibold border-b-2 border-indigo-600 text-indigo-600 transition flex items-center gap-2";
+                        content.classList.remove('hidden');
+                    } else {
+                        btn.className = "px-5 py-3.5 text-sm font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-800 transition flex items-center gap-2";
+                        content.classList.add('hidden');
+                    }
                 }
             });
 
-            if (tabId === 'explorer') {
+            if (tabId === 'compare') {
+                renderCompareSection();
+            } else if (tabId === 'explorer') {
                 renderExplorerInterface();
+            } else if (tabId === 'dominant') {
+                renderDominantInterface();
+            } else if (tabId === 'dominant-stats') {
+                renderDominantStatsInterface();
             }
         }
 
@@ -1193,19 +2074,30 @@
             calculateOverallStats();
             initCharts();
             populateCombinedFilters();
+            populateDominantCountryFilter();
+            populateDominantStatsCountryFilter();
             loadSelectedCuratedSheet();
+            renderCompareSection();
             filterCombinedPapers();
             extractAndComputeMappingMatrix();
+            renderDominantInterface();
+            renderDominantStatsInterface();
         }
 
         function calculateOverallStats() {
             const totalPapers = datasets.combined ? datasets.combined.length : 0;
             document.getElementById('stat-total-papers').innerText = totalPapers.toLocaleString();
 
-            const totalCurated = (datasets.antibiotics?.length || 0) +
-                (datasets.diseases?.length || 0) +
-                (datasets.genes?.length || 0) +
-                (datasets.pathogens?.length || 0);
+            let totalCurated = 0;
+            ['antibiotics', 'diseases', 'genes', 'pathogens'].forEach(cat => {
+                const rows = datasets[cat] || [];
+                rows.forEach(r => {
+                    const val = getCuratedValueFromRow(r);
+                    if (val && val.trim() !== '' && val.toLowerCase() !== 'nan') {
+                        totalCurated++;
+                    }
+                });
+            });
             document.getElementById('stat-total-curations').innerText = totalCurated.toLocaleString();
 
             const countries = new Set();
@@ -1271,6 +2163,16 @@
                 }
             });
 
+            const countEntities = (cat) => {
+                const rows = datasets[cat] || [];
+                let c = 0;
+                rows.forEach(r => {
+                    const val = getCuratedValueFromRow(r);
+                    if (val && val.trim() !== '' && val.toLowerCase() !== 'nan') c++;
+                });
+                return c;
+            };
+
             const entCtx = document.getElementById('chart-entities').getContext('2d');
             entityChart = new Chart(entCtx, {
                 type: 'doughnut',
@@ -1278,10 +2180,10 @@
                     labels: ['Antibiotics', 'Diseases', 'Genes', 'Pathogens'],
                     datasets: [{
                         data: [
-                            datasets.antibiotics?.length || 0,
-                            datasets.diseases?.length || 0,
-                            datasets.genes?.length || 0,
-                            datasets.pathogens?.length || 0
+                            countEntities('antibiotics'),
+                            countEntities('diseases'),
+                            countEntities('genes'),
+                            countEntities('pathogens')
                         ],
                         backgroundColor: ['#f59e0b', '#ef4444', '#10b981', '#3b82f6'],
                     }]
@@ -1312,19 +2214,46 @@
 
             const keys = originalData.length > 0 ? Object.keys(originalData[0]) : [];
             const origKey = keys[0];
-            const curatedKey = keys[1];
 
             curatedSearchFilteredData = originalData.filter(row => {
                 const origVal = String(row[origKey] || '').toLowerCase();
-                const curVal = String(row[curatedKey] || '').toLowerCase();
+                const col2 = String(row[keys[1]] || '').trim();
+                const col3 = getReview1ColKey(keys) ? String(row[getReview1ColKey(keys)] || '').trim() : col2;
+                const colAGName = getAntigravityColKey(keys);
+                const colAG = colAGName ? String(row[colAGName] || '').trim() : '';
+                const colHumanName = getHumanVerifiedColKey(keys);
+                const colHuman = colHumanName ? String(row[colHumanName] || '').trim() : '';
 
-                const matchesSearch = origVal.includes(query) || curVal.includes(query);
+                const curVal = getCuratedValueFromRow(row).toLowerCase();
+
+                const isCol2Pop = (col2 !== '' && col2.toLowerCase() !== 'nan');
+                const isCol3Pop = (col3 !== '' && col3.toLowerCase() !== 'nan');
+                const isAGPop = (colAG !== '' && colAG.toLowerCase() !== 'nan');
+                const isHumanPop = (colHuman !== '' && colHuman.toLowerCase() !== 'nan');
+
+                const matchesSearch = origVal.includes(query) || curVal.includes(query) || col2.toLowerCase().includes(query) || col3.toLowerCase().includes(query) || colAG.toLowerCase().includes(query) || colHuman.toLowerCase().includes(query);
 
                 let matchesValueFilter = true;
                 if (curatedValueFilter === 'populated') {
                     matchesValueFilter = (curVal.trim() !== '' && curVal.trim() !== 'nan');
                 } else if (curatedValueFilter === 'empty') {
                     matchesValueFilter = (curVal.trim() === '' || curVal.trim() === 'nan');
+                } else if (curatedValueFilter === 'col2_has') {
+                    matchesValueFilter = isCol2Pop;
+                } else if (curatedValueFilter === 'col2_empty') {
+                    matchesValueFilter = !isCol2Pop;
+                } else if (curatedValueFilter === 'col3_has') {
+                    matchesValueFilter = isCol3Pop;
+                } else if (curatedValueFilter === 'col3_empty') {
+                    matchesValueFilter = !isCol3Pop;
+                } else if (curatedValueFilter === 'col4_has') {
+                    matchesValueFilter = isAGPop;
+                } else if (curatedValueFilter === 'col4_empty') {
+                    matchesValueFilter = !isAGPop;
+                } else if (curatedValueFilter === 'col5_has') {
+                    matchesValueFilter = isHumanPop;
+                } else if (curatedValueFilter === 'col5_empty') {
+                    matchesValueFilter = !isHumanPop;
                 }
 
                 return matchesSearch && matchesValueFilter;
@@ -1339,32 +2268,71 @@
             const tbody = document.getElementById('curated-table-body');
             tbody.innerHTML = '';
 
-            if (curatedSearchFilteredData.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="2" class="p-8 text-center text-slate-400">No matching mappings found in this collection.</td></tr>`;
+            const total = curatedSearchFilteredData.length;
+            const totalPages = Math.ceil(total / curatedPageSize) || 1;
+
+            const badgeEl = document.getElementById('curated-total-pages-badge');
+            if (badgeEl) {
+                badgeEl.innerText = `Page ${curatedPage} of ${totalPages} (Total Pages: ${totalPages})`;
+            }
+
+            if (total === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">No matching mappings found in this collection.</td></tr>`;
                 document.getElementById('curated-pagination-info').innerText = "Showing 0 of 0";
                 return;
             }
 
             const keys = Object.keys(curatedSearchFilteredData[0]);
             const origKey = keys[0];
-            const curatedKey = keys[1];
 
             const startIdx = (curatedPage - 1) * curatedPageSize;
-            const endIdx = Math.min(startIdx + curatedPageSize, curatedSearchFilteredData.length);
+            const endIdx = Math.min(startIdx + curatedPageSize, total);
             const paginatedRows = curatedSearchFilteredData.slice(startIdx, endIdx);
 
-            paginatedRows.forEach(row => {
+            paginatedRows.forEach((row, rowIdx) => {
+                const globalSl = startIdx + rowIdx + 1;
+                const origVal = row[origKey] || '-';
+                const col2 = String(row[keys[1]] || '').trim();
+                const col3Key = getReview1ColKey(keys);
+                const col3 = col3Key ? String(row[col3Key] || '').trim() : col2;
+                const colAGKey = getAntigravityColKey(keys);
+                const colAG = colAGKey ? String(row[colAGKey] || '').trim() : '';
+                const colHumanKey = getHumanVerifiedColKey(keys);
+                const colHuman = colHumanKey ? String(row[colHumanKey] || '').trim() : '';
+
+                const curVal = getCuratedValueFromRow(row);
+
+                const renderChip = (val, isHuman = false) => {
+                    if (!val || val.toLowerCase() === 'nan') return '<span class="text-slate-300 italic text-[10px]">-</span>';
+                    if (isHuman) {
+                        return `<span class="inline-block px-2 py-0.5 rounded bg-emerald-100 border border-emerald-300 text-emerald-900 font-extrabold text-[11px] shadow-2xs"><i class="fa-solid fa-user-check mr-1 text-[9px]"></i>${val}</span>`;
+                    }
+                    return `<span class="inline-block px-2 py-0.5 rounded bg-slate-100 text-slate-700 text-[11px]">${val}</span>`;
+                };
+
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50 transition">
-                        <td class="p-4 border-b border-slate-100 font-mono text-slate-600">${row[origKey] || '-'}</td>
-                        <td class="p-4 border-b border-slate-100">
-                            <span class="inline-block px-2.5 py-1 rounded bg-indigo-50 border border-indigo-100 text-indigo-700 font-semibold">${row[curatedKey] || '<span class="text-slate-300">Unmapped / Rejected</span>'}</span>
+                        <td class="p-3.5 border-b border-slate-100 text-center font-mono font-bold text-slate-400 text-xs">${globalSl}</td>
+                        <td class="p-3.5 border-b border-slate-100 font-mono text-slate-700">
+                            <div class="flex items-start gap-2">
+                                <button onclick="copyToClipboard(null, this)" title="Copy Target Text" class="mt-0.5 p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition">
+                                    <i class="fa-regular fa-copy text-xs"></i>
+                                </button>
+                                <span class="flex-1 font-semibold text-slate-800">${origVal}</span>
+                            </div>
+                        </td>
+                        <td class="p-3.5 border-b border-slate-100">${renderChip(col2)}</td>
+                        <td class="p-3.5 border-b border-slate-100">${renderChip(col3)}</td>
+                        <td class="p-3.5 border-b border-slate-100 bg-purple-50/20">${renderChip(colAG)}</td>
+                        <td class="p-3.5 border-b border-slate-100 bg-indigo-50/20 font-bold">${renderChip(colHuman, true)}</td>
+                        <td class="p-3.5 border-b border-slate-100 bg-emerald-50/30">
+                            <span class="inline-block px-2.5 py-1 rounded bg-emerald-600 text-white font-extrabold text-xs shadow-2xs">${curVal || '<span class="opacity-60">Unmapped</span>'}</span>
                         </td>
                     </tr>
                 `;
             });
 
-            document.getElementById('curated-pagination-info').innerText = `Showing ${startIdx + 1} - ${endIdx} of ${curatedSearchFilteredData.length} mappings`;
+            document.getElementById('curated-pagination-info').innerText = `Showing ${startIdx + 1} - ${endIdx} of ${total} mappings`;
             document.getElementById('curated-goto-page').value = curatedPage;
         }
 
@@ -1382,7 +2350,6 @@
             renderCuratedTable();
         }
 
-        // Paging jumps for Curated Dictionaries
         function jumpToCuratedPage(val) {
             const pageNum = parseInt(val);
             const totalPages = Math.ceil(curatedSearchFilteredData.length / curatedPageSize);
@@ -1390,6 +2357,453 @@
                 curatedPage = pageNum;
                 renderCuratedTable();
             }
+        }
+
+        // ================= COMPARE & HUMAN-IN-THE-LOOP SECTION LOGIC =================
+        function renderCompareSection() {
+            compareActiveSheet = document.getElementById('compare-sheet-selector')?.value || 'antibiotics';
+            const originalData = datasets[compareActiveSheet] || [];
+
+            let matchCount = 0;
+            let antigravityCount = 0;
+            let humanCount = 0;
+            let excludedCount = 0;
+
+            originalData.forEach(row => {
+                const keys = Object.keys(row);
+                const col2 = String(row[keys[1]] || '').trim();
+                const col3 = getReview1ColKey(keys) ? String(row[getReview1ColKey(keys)] || '').trim() : col2;
+                const colAGName = getAntigravityColKey(keys);
+                const colAG = colAGName ? String(row[colAGName] || '').trim() : '';
+                const colHumanName = getHumanVerifiedColKey(keys);
+                const colHuman = colHumanName ? String(row[colHumanName] || '').trim() : '';
+
+                const isCol2Pop = (col2 !== '' && col2.toLowerCase() !== 'nan');
+                const isCol3Pop = (col3 !== '' && col3.toLowerCase() !== 'nan');
+                const isAGPop = (colAG !== '' && colAG.toLowerCase() !== 'nan');
+                const isHumanPop = (colHuman !== '' && colHuman.toLowerCase() !== 'nan');
+
+                if (isAGPop) antigravityCount++;
+                if (isHumanPop) humanCount++;
+                if (col2 === col3) matchCount++;
+                if (isCol2Pop && !isCol3Pop) excludedCount++;
+            });
+
+            const totalRows = originalData.length;
+            const matchPct = totalRows > 0 ? Math.round((matchCount / totalRows) * 100) : 0;
+
+            document.getElementById('compare-stat-match-pct').innerText = `${matchPct}%`;
+            document.getElementById('compare-stat-antigravity-count').innerText = antigravityCount.toLocaleString();
+            document.getElementById('compare-stat-human-count').innerText = humanCount.toLocaleString();
+            document.getElementById('compare-stat-excluded-count').innerText = excludedCount.toLocaleString();
+
+            filterCompareTable();
+        }
+
+        function filterCompareTable() {
+            const query = (document.getElementById('search-compare')?.value || '').toLowerCase();
+            compareActiveSheet = document.getElementById('compare-sheet-selector')?.value || 'antibiotics';
+            compareStatusFilter = document.getElementById('compare-status-filter')?.value || 'all';
+
+            const originalData = datasets[compareActiveSheet] || [];
+            if (originalData.length === 0) {
+                compareSearchFilteredData = [];
+                renderCompareTable();
+                return;
+            }
+
+            const keys = Object.keys(originalData[0]);
+            const origKey = keys[0];
+
+            compareSearchFilteredData = originalData.filter(row => {
+                const origVal = String(row[origKey] || '').toLowerCase();
+                const col2 = String(row[keys[1]] || '').trim();
+                const col3 = getReview1ColKey(keys) ? String(row[getReview1ColKey(keys)] || '').trim() : col2;
+                const colAGName = getAntigravityColKey(keys);
+                const colAG = colAGName ? String(row[colAGName] || '').trim() : '';
+                const colHumanName = getHumanVerifiedColKey(keys);
+                const colHuman = colHumanName ? String(row[colHumanName] || '').trim() : '';
+
+                const matchesSearch = origVal.includes(query) || col2.toLowerCase().includes(query) || col3.toLowerCase().includes(query) || colAG.toLowerCase().includes(query) || colHuman.toLowerCase().includes(query);
+
+                const isCol2Pop = (col2 !== '' && col2.toLowerCase() !== 'nan');
+                const isCol3Pop = (col3 !== '' && col3.toLowerCase() !== 'nan');
+                const isAGPop = (colAG !== '' && colAG.toLowerCase() !== 'nan');
+                const isHumanPop = (colHuman !== '' && colHuman.toLowerCase() !== 'nan');
+
+                let matchesStatus = true;
+                if (compareStatusFilter === 'col2_has') {
+                    matchesStatus = isCol2Pop;
+                } else if (compareStatusFilter === 'col2_empty') {
+                    matchesStatus = !isCol2Pop;
+                } else if (compareStatusFilter === 'col3_has') {
+                    matchesStatus = isCol3Pop;
+                } else if (compareStatusFilter === 'col3_empty') {
+                    matchesStatus = !isCol3Pop;
+                } else if (compareStatusFilter === 'col4_has' || compareStatusFilter === 'antigravity_pop') {
+                    matchesStatus = isAGPop;
+                } else if (compareStatusFilter === 'col4_empty') {
+                    matchesStatus = !isAGPop;
+                } else if (compareStatusFilter === 'col5_has' || compareStatusFilter === 'human_saved') {
+                    matchesStatus = isHumanPop;
+                } else if (compareStatusFilter === 'col5_empty') {
+                    matchesStatus = !isHumanPop;
+                } else if (compareStatusFilter === 'match') {
+                    matchesStatus = (col2 === col3);
+                } else if (compareStatusFilter === 'modified') {
+                    matchesStatus = (col2 !== col3 && isCol2Pop && isCol3Pop);
+                } else if (compareStatusFilter === 'excluded') {
+                    matchesStatus = (isCol2Pop && !isCol3Pop);
+                }
+
+                return matchesSearch && matchesStatus;
+            });
+
+            comparePage = 1;
+            renderCompareTable();
+        }
+
+        function renderCompareTable() {
+            const tbody = document.getElementById('compare-table-body');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const total = compareSearchFilteredData.length;
+            const totalPages = Math.ceil(total / comparePageSize) || 1;
+
+            const startIdx = (comparePage - 1) * comparePageSize;
+            const endIdx = Math.min(startIdx + comparePageSize, total);
+
+            document.getElementById('compare-pagination-info').innerText = total > 0
+                ? `Showing ${startIdx + 1} - ${endIdx} of ${total} comparative rows`
+                : `Showing 0 of 0 comparative rows`;
+
+            const badgeEl = document.getElementById('compare-total-pages-badge');
+            if (badgeEl) {
+                badgeEl.innerText = `Page ${comparePage} of ${totalPages} (Total Pages: ${totalPages})`;
+            }
+
+            if (total === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-slate-400">No comparative records found for these filter criteria.</td></tr>`;
+                return;
+            }
+
+            const paginated = compareSearchFilteredData.slice(startIdx, endIdx);
+
+            paginated.forEach((row, rowIdx) => {
+                const globalIdx = startIdx + rowIdx;
+                const globalSl = globalIdx + 1;
+                const keys = Object.keys(row);
+                const origVal = row[keys[0]] || '-';
+                const col2 = String(row[keys[1]] || '').trim();
+                const col3 = getReview1ColKey(keys) ? String(row[getReview1ColKey(keys)] || '').trim() : col2;
+                const colAGName = getAntigravityColKey(keys);
+                const colAG = colAGName ? String(row[colAGName] || '').trim() : '';
+                const colHumanName = getHumanVerifiedColKey(keys);
+                const colHuman = colHumanName ? String(row[colHumanName] || '').trim() : '';
+
+                const versionTimestamp = row.human_verified_updated_at || 0;
+
+                const isCol2Pop = (col2 !== '' && col2.toLowerCase() !== 'nan');
+                const isCol3Pop = (col3 !== '' && col3.toLowerCase() !== 'nan');
+                const isAGPop = (colAG !== '' && colAG.toLowerCase() !== 'nan');
+                const isHumanPop = (colHuman !== '' && colHuman.toLowerCase() !== 'nan');
+
+                let deltaBadge = '';
+                if (isHumanPop) {
+                    deltaBadge = `<span class="px-2 py-0.5 rounded bg-emerald-100 border border-emerald-300 text-emerald-800 font-extrabold text-[10px] shadow-2xs"><i class="fa-solid fa-user-check mr-1"></i> Human Verified</span>`;
+                } else if (isAGPop) {
+                    deltaBadge = `<span class="px-2 py-0.5 rounded bg-purple-100 border border-purple-300 text-purple-800 font-extrabold text-[10px] shadow-2xs"><i class="fa-solid fa-robot mr-1"></i> Antigravity AI</span>`;
+                } else if (col2 === col3) {
+                    deltaBadge = `<span class="px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-[10px]"><i class="fa-solid fa-check mr-1"></i> Exact Match</span>`;
+                } else if (isCol2Pop && isCol3Pop) {
+                    deltaBadge = `<span class="px-2 py-0.5 rounded bg-indigo-50 border border-indigo-200 text-indigo-700 font-bold text-[10px]"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Refined Name</span>`;
+                } else if (isCol2Pop && !isCol3Pop) {
+                    deltaBadge = `<span class="px-2 py-0.5 rounded bg-rose-50 border border-rose-200 text-rose-700 font-bold text-[10px]"><i class="fa-solid fa-filter mr-1"></i> Excluded Non-Entity</span>`;
+                }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50/80 transition" id="compare-row-${globalIdx}">
+                        <td class="p-3.5 text-center font-mono font-bold text-slate-400 text-xs">${globalSl}</td>
+                        <td class="p-3.5 font-mono text-slate-700 leading-tight">
+                            <div class="flex items-start gap-1.5">
+                                <button onclick="copyToClipboard(null, this)" title="Copy Original Extract Text" class="mt-0.5 p-1 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition">
+                                    <i class="fa-regular fa-copy text-xs"></i>
+                                </button>
+                                <span class="flex-1">${origVal}</span>
+                            </div>
+                        </td>
+                        <td class="p-3.5 space-y-1">
+                            <span class="inline-block px-2 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-800 font-semibold text-xs">${col2 || '<span class="text-slate-300">Unmapped</span>'}</span>
+                            ${col2 ? `<button onclick="quickPopulateHumanInput(${globalIdx}, 'col2')" class="block text-[9px] text-indigo-600 hover:text-indigo-800 font-bold underline"><i class="fa-solid fa-hand-pointer"></i> Copy Col 2</button>` : ''}
+                        </td>
+                        <td class="p-3.5 space-y-1">
+                            <span class="inline-block px-2 py-0.5 rounded bg-indigo-50 border border-indigo-200 text-indigo-800 font-bold text-xs">${col3 || '<span class="text-slate-300">Unmapped</span>'}</span>
+                            ${col3 ? `<button onclick="quickPopulateHumanInput(${globalIdx}, 'col3')" class="block text-[9px] text-indigo-600 hover:text-indigo-800 font-bold underline"><i class="fa-solid fa-hand-pointer"></i> Copy Col 3</button>` : ''}
+                        </td>
+                        <td class="p-3.5 bg-purple-50/30 border-l border-purple-100 space-y-1">
+                            <span class="inline-block px-2.5 py-1 rounded bg-purple-100/80 border border-purple-300 text-purple-900 font-extrabold text-xs shadow-2xs">${colAG || '<span class="text-slate-300 font-normal">Unmapped</span>'}</span>
+                            ${colAG ? `<button onclick="quickPopulateHumanInput(${globalIdx}, 'colAG')" class="block text-[9px] text-purple-700 hover:text-purple-900 font-extrabold underline"><i class="fa-solid fa-robot"></i> 1-Click Copy Antigravity</button>` : ''}
+                        </td>
+                        <td class="p-3.5 bg-indigo-50/20 border-l border-indigo-100/60 space-y-1.5">
+                            <div class="flex items-center gap-1.5">
+                                <input type="text" id="human-input-${globalIdx}" value="${colHuman}" placeholder="Enter human correction..." class="flex-1 px-2.5 py-1 bg-white border border-indigo-200 rounded text-xs focus:outline-none focus:border-indigo-600 font-semibold text-slate-800">
+                                <button id="btn-save-${globalIdx}" onclick="saveHumanCorrection(${globalIdx})" class="px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-bold shadow-sm transition flex items-center gap-1">
+                                    <i class="fa-solid fa-floppy-disk"></i> Save
+                                </button>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-1 text-[9px]">
+                                <button onclick="quickPopulateHumanInput(${globalIdx}, 'col2')" class="px-1.5 py-0.5 bg-white border border-slate-200 hover:bg-indigo-50 rounded text-slate-600 font-semibold transition">👈 Col 2</button>
+                                <button onclick="quickPopulateHumanInput(${globalIdx}, 'col3')" class="px-1.5 py-0.5 bg-white border border-slate-200 hover:bg-indigo-50 rounded text-slate-600 font-semibold transition">👈 Col 3</button>
+                                <button onclick="quickPopulateHumanInput(${globalIdx}, 'colAG')" class="px-1.5 py-0.5 bg-purple-50 border border-purple-200 hover:bg-purple-100 text-purple-800 font-bold rounded transition">🤖 Antigravity</button>
+                                <button onclick="quickPopulateHumanInput(${globalIdx}, '')" class="px-1.5 py-0.5 bg-white border border-slate-200 hover:bg-rose-50 text-rose-600 font-semibold rounded transition">✖ Clear</button>
+                            </div>
+                        </td>
+                        <td class="p-3.5 text-center" id="compare-status-cell-${globalIdx}">${deltaBadge}</td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('compare-goto-page').value = comparePage;
+        };
+
+        function copyToClipboard(text, btnElement) {
+            if (!text && btnElement) {
+                const span = btnElement.parentElement ? btnElement.parentElement.querySelector('span') : null;
+                if (span) {
+                    text = span.innerText || span.textContent || '';
+                }
+            }
+
+            text = String(text || '').trim();
+            if (!text) return;
+
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showCopySuccessFeedback(btnElement);
+                }).catch(err => {
+                    fallbackCopyToClipboard(text, btnElement);
+                });
+            } else {
+                fallbackCopyToClipboard(text, btnElement);
+            }
+        }
+
+        function fallbackCopyToClipboard(text, btnElement) {
+            try {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.top = '0';
+                textarea.style.left = '0';
+                textarea.style.opacity = '0';
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textarea);
+                if (successful) {
+                    showCopySuccessFeedback(btnElement);
+                }
+            } catch (err) {
+                console.error('Fallback copy failed:', err);
+            }
+        }
+
+        function showCopySuccessFeedback(btnElement) {
+            if (btnElement) {
+                const icon = btnElement.querySelector('i');
+                if (icon) {
+                    const oldClass = icon.className;
+                    icon.className = 'fa-solid fa-check text-emerald-600';
+                    setTimeout(() => icon.className = oldClass, 1200);
+                }
+            }
+        }
+
+        function quickPopulateHumanInput(globalIdx, colType) {
+            const input = document.getElementById(`human-input-${globalIdx}`);
+            const rowData = compareSearchFilteredData[globalIdx];
+            if (!input || !rowData) return;
+
+            const keys = Object.keys(rowData);
+            let val = '';
+            if (colType === 'col2') {
+                val = String(rowData[keys[1]] || '').trim();
+            } else if (colType === 'col3') {
+                val = keys.length >= 3 ? String(rowData[keys[2]] || '').trim() : String(rowData[keys[1]] || '').trim();
+            } else if (colType === 'colAG') {
+                const colAGName = keys.find(k => k.includes('antigravity'));
+                val = colAGName ? String(rowData[colAGName] || '').trim() : '';
+            } else {
+                val = colType || '';
+            }
+
+            if (val.toLowerCase() === 'nan' || val.toLowerCase() === 'null' || val.toLowerCase() === 'undefined') {
+                val = '';
+            }
+
+            input.value = val;
+            input.classList.add('ring-2', 'ring-indigo-400');
+            setTimeout(() => input.classList.remove('ring-2', 'ring-indigo-400'), 800);
+
+            const btn = document.getElementById(`btn-save-${globalIdx}`);
+            if (btn) {
+                btn.click();
+            }
+        }
+
+        async function saveHumanCorrection(globalIdx) {
+            const targetRow = compareSearchFilteredData[globalIdx];
+            const input = document.getElementById(`human-input-${globalIdx}`);
+            const btn = document.getElementById(`btn-save-${globalIdx}`);
+            if (!input || !btn || !targetRow) return;
+
+            const keys = Object.keys(targetRow);
+            const origText = String(targetRow[keys[0]] || '').trim();
+            const clientVersion = targetRow.human_verified_updated_at || 0;
+            const humanVal = input.value.trim();
+            const sheet = compareActiveSheet;
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin"></i> Saving...`;
+
+            let serverSaved = false;
+            let versionTimestamp = Math.floor(Date.now() / 1000);
+
+            try {
+                const response = await fetch('/api/save_human_review', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sheet: sheet,
+                        original_text: origText,
+                        human_val: humanVal,
+                        version_timestamp: clientVersion
+                    })
+                });
+
+                if (response.status === 409) {
+                    const errData = await response.json();
+                    alert(`⚠️ CONCURRENCY WARNING!\n${errData.message}\n\nAnother user or session modified this item. The page will reload the latest dataset.`);
+                    initAutoLoading();
+                    return;
+                }
+
+                if (response.ok) {
+                    const resData = await response.json();
+                    if (resData.status === 'success') {
+                        serverSaved = true;
+                        if (resData.version_timestamp) versionTimestamp = resData.version_timestamp;
+                    }
+                }
+            } catch (e) {
+                console.info("Python backend server not reachable (Static mode). Saving correction into Browser Storage:", e.message);
+            }
+
+            // Always save to Browser LocalStorage so corrections survive page refreshes in pure static HTML mode
+            saveCorrectionToStorage(sheet, origText, humanVal, versionTimestamp);
+
+            // Update in-memory dataset
+            const activeData = datasets[sheet] || [];
+            const sheetKeys = activeData.length > 0 ? Object.keys(activeData[0]) : [];
+            const colSingular = sheet.endsWith('s') ? sheet.slice(0, -1) : sheet;
+            const col4Name = getHumanVerifiedColKey(sheetKeys) || `curated_${colSingular}_human_verified`;
+
+            const matchRow = activeData.find(r => String(r[sheetKeys[0]] || '').trim() === origText);
+            if (matchRow) {
+                matchRow[col4Name] = humanVal;
+                matchRow.human_verified_updated_at = versionTimestamp;
+            }
+            targetRow[col4Name] = humanVal;
+            targetRow.human_verified_updated_at = versionTimestamp;
+
+            // Show success status based on save target
+            btn.className = "px-2.5 py-1 bg-emerald-600 text-white rounded text-xs font-bold shadow-sm flex items-center gap-1";
+            btn.innerHTML = serverSaved
+                ? `<i class="fa-solid fa-check"></i> Saved (Server & Browser) ✓`
+                : `<i class="fa-solid fa-hard-drive"></i> Saved (Browser) ✓`;
+
+            const statusCell = document.getElementById(`compare-status-cell-${globalIdx}`);
+            if (statusCell && humanVal) {
+                statusCell.innerHTML = `<span class="px-2 py-0.5 rounded bg-emerald-100 border border-emerald-300 text-emerald-800 font-extrabold text-[10px] shadow-2xs"><i class="fa-solid fa-user-check mr-1"></i> Human Verified</span>`;
+            }
+
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.className = "px-2.5 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-bold shadow-sm transition flex items-center gap-1";
+                btn.innerHTML = `<i class="fa-solid fa-floppy-disk"></i> Save`;
+            }, 2500);
+
+            calculateOverallStats();
+        }
+
+        function downloadFullCuratedExcel(sheet = compareActiveSheet) {
+            const data = datasets[sheet];
+            if (!data || data.length === 0) {
+                alert(`No dataset available to export for '${sheet}'.`);
+                return;
+            }
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, sheet);
+            XLSX.writeFile(wb, `final_${sheet}_curated_updated.xlsx`);
+        }
+
+        function changeComparePage(direction) {
+            const totalPages = Math.ceil(compareSearchFilteredData.length / comparePageSize);
+            comparePage += direction;
+            if (comparePage < 1) comparePage = 1;
+            if (comparePage > totalPages) comparePage = totalPages;
+            renderCompareTable();
+        }
+
+        function changeComparePageSize(size) {
+            comparePageSize = parseInt(size);
+            comparePage = 1;
+            renderCompareTable();
+        }
+
+        function jumpToComparePage(val) {
+            const pageNum = parseInt(val);
+            const totalPages = Math.ceil(compareSearchFilteredData.length / comparePageSize);
+            if (pageNum >= 1 && pageNum <= totalPages) {
+                comparePage = pageNum;
+                renderCompareTable();
+            }
+        }
+
+        function downloadCompareReport() {
+            const data = compareSearchFilteredData;
+            if (!data || data.length === 0) {
+                alert("No comparison data available to export.");
+                return;
+            }
+
+            const exportRows = data.map(r => {
+                const keys = Object.keys(r);
+                const col2 = String(r[keys[1]] || '').trim();
+                const col3 = getReview1ColKey(keys) ? String(r[getReview1ColKey(keys)] || '').trim() : col2;
+                const colAGName = getAntigravityColKey(keys);
+                const colAG = colAGName ? String(r[colAGName] || '').trim() : '';
+                const colHumanName = getHumanVerifiedColKey(keys);
+                const colHuman = colHumanName ? String(r[colHumanName] || '').trim() : '';
+
+                return {
+                    'Original_Extract_Target': r[keys[0]] || '',
+                    'Manual_Curated_Col2': col2,
+                    'Auto_Review1_Col3': col3,
+                    'Antigravity_AI_Correction': colAG,
+                    'Human_Verified_Col5': colHuman,
+                    'Match_Status': colHuman ? 'HUMAN_VERIFIED' : (colAG ? 'ANTIGRAVITY_AI' : (col2 === col3 ? 'EXACT_MATCH' : 'REFINED'))
+                };
+            });
+
+            const ws = XLSX.utils.json_to_sheet(exportRows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "ComparisonReport");
+            XLSX.writeFile(wb, `multi_model_curation_${compareActiveSheet}.xlsx`);
         }
 
         // ================= COMBINED PAPERS INSPECTOR & GRID =================
@@ -1430,12 +2844,10 @@
 
                 if (alignmentFilter) {
                     let hasMismatch = false;
-                    ['genes', 'diseases', 'pathogens', 'chemicals'].forEach(type => {
-                        const extCol = `extracted_${type}`;
-                        const curCol = `curated_${type === 'chemicals' ? 'antibiotics' : type}`;
-
+                    ['genes', 'diseases', 'pathogens', 'antibiotics'].forEach(type => {
+                        const extCol = `extracted_${type === 'antibiotics' ? 'chemicals' : type}`;
                         const extracted = parseListField(p[extCol]);
-                        const curated = parseListField(p[curCol]);
+                        const curated = getActiveCuratedEntitiesForPaper(p, type);
 
                         const matched = extracted.filter(e => curated.map(c => c.toLowerCase()).includes(e.toLowerCase()));
                         if (matched.length !== extracted.length || extracted.length !== curated.length) {
@@ -1476,7 +2888,11 @@
                 let authorDisplayStr = parsedAuthors.length > 0 ? parsedAuthors.slice(0, 2).join(', ') : 'Unknown';
                 if (parsedAuthors.length > 2) authorDisplayStr += ' et al.';
 
-                const totalC = parseListField(p.curated_genes).length + parseListField(p.curated_diseases).length + parseListField(p.curated_pathogens).length + parseListField(p.curated_antibiotics).length;
+                const totalC = getActiveCuratedEntitiesForPaper(p, 'genes').length +
+                    getActiveCuratedEntitiesForPaper(p, 'diseases').length +
+                    getActiveCuratedEntitiesForPaper(p, 'pathogens').length +
+                    getActiveCuratedEntitiesForPaper(p, 'antibiotics').length;
+
                 const totalE = parseListField(p.extracted_genes).length + parseListField(p.extracted_diseases).length + parseListField(p.extracted_pathogens).length + parseListField(p.extracted_chemicals).length;
 
                 const isSelected = activeSelectedPaper && activeSelectedPaper.pmcid_pmid === p.pmcid_pmid;
@@ -1525,13 +2941,18 @@
             let parsedAuthors = parseListField(paper.authorlist);
             document.getElementById('inspect-authors').innerText = `Authors: ${parsedAuthors.join(', ')} (${paper.year || 'Unknown'})`;
 
-            // Configure Active Audit inspector expand detailed viewer button
             document.getElementById('inspect-expand-btn').setAttribute('onclick', `openPaperModal('${paper.pmcid_pmid}')`);
 
-            renderCategoryMatrix('genes', parseListField(paper.extracted_genes), parseListField(paper.curated_genes));
-            renderCategoryMatrix('diseases', parseListField(paper.extracted_diseases), parseListField(paper.curated_diseases));
-            renderCategoryMatrix('pathogens', parseListField(paper.extracted_pathogens), parseListField(paper.curated_pathogens));
-            renderCategoryMatrix('antibiotics', parseListField(paper.extracted_chemicals), parseListField(paper.curated_antibiotics));
+            const modeLabelText = globalCurationMode === 'human_verified' ? 'Human Verified (Col 5)' : (globalCurationMode === 'antigravity' ? 'Antigravity AI (Col 4)' : (globalCurationMode === 'review1' ? 'Auto Review1 (Col 3)' : 'Curated (Col 2)'));
+            ['genes', 'diseases', 'pathogens', 'antibiotics'].forEach(cat => {
+                const label = document.getElementById(`inspect-curated-${cat}-label`);
+                if (label) label.innerText = modeLabelText;
+            });
+
+            renderCategoryMatrix('genes', parseListField(paper.extracted_genes), getActiveCuratedEntitiesForPaper(paper, 'genes'));
+            renderCategoryMatrix('diseases', parseListField(paper.extracted_diseases), getActiveCuratedEntitiesForPaper(paper, 'diseases'));
+            renderCategoryMatrix('pathogens', parseListField(paper.extracted_pathogens), getActiveCuratedEntitiesForPaper(paper, 'pathogens'));
+            renderCategoryMatrix('antibiotics', parseListField(paper.extracted_chemicals), getActiveCuratedEntitiesForPaper(paper, 'antibiotics'));
         }
 
         function renderCategoryMatrix(cat, extracted, curated) {
@@ -1594,10 +3015,10 @@
             const mapSet = new Map();
 
             datasets.combined.forEach(p => {
-                const diseases = parseListField(p.curated_diseases);
-                const pathogens = parseListField(p.curated_pathogens);
-                const genes = parseListField(p.curated_genes);
-                const antibiotics = parseListField(p.curated_antibiotics);
+                const diseases = getActiveCuratedEntitiesForPaper(p, 'diseases');
+                const pathogens = getActiveCuratedEntitiesForPaper(p, 'pathogens');
+                const genes = getActiveCuratedEntitiesForPaper(p, 'genes');
+                const antibiotics = getActiveCuratedEntitiesForPaper(p, 'antibiotics');
 
                 const dList = diseases.length > 0 ? diseases : ['-'];
                 const pList = pathogens.length > 0 ? pathogens : ['-'];
@@ -1755,10 +3176,10 @@
             const uAntibiotics = new Set();
 
             datasets.combined.forEach(p => {
-                parseListField(p.curated_genes).forEach(x => uGenes.add(x));
-                parseListField(p.curated_pathogens).forEach(x => uPathogens.add(x));
-                parseListField(p.curated_diseases).forEach(x => uDiseases.add(x));
-                parseListField(p.curated_antibiotics).forEach(x => uAntibiotics.add(x));
+                getActiveCuratedEntitiesForPaper(p, 'genes').forEach(x => uGenes.add(x));
+                getActiveCuratedEntitiesForPaper(p, 'pathogens').forEach(x => uPathogens.add(x));
+                getActiveCuratedEntitiesForPaper(p, 'diseases').forEach(x => uDiseases.add(x));
+                getActiveCuratedEntitiesForPaper(p, 'antibiotics').forEach(x => uAntibiotics.add(x));
             });
 
             renderExplorerColumnList('gene', Array.from(uGenes).sort());
@@ -1812,8 +3233,7 @@
             explorerActiveEntities.value = val;
 
             const matches = datasets.combined.filter(p => {
-                const colName = `curated_${type === 'antibiotic' ? 'antibiotics' : type + 's'}`;
-                const arr = parseListField(p[colName]);
+                const arr = getActiveCuratedEntitiesForPaper(p, type === 'antibiotic' ? 'antibiotics' : type + 's');
                 return arr.some(x => x.toLowerCase() === val.toLowerCase());
             });
 
@@ -1850,10 +3270,12 @@
             let authorDisplayStr = parsedAuthors.length > 0 ? parsedAuthors.slice(0, 2).join(', ') : 'Unknown';
             if (parsedAuthors.length > 2) authorDisplayStr += ' et al.';
 
-            const rawGenes = parseListField(p.curated_genes);
-            const rawDiseases = parseListField(p.curated_diseases);
-            const rawPathogens = parseListField(p.curated_pathogens);
-            const rawAntibiotics = parseListField(p.curated_antibiotics);
+            const rawGenes = getActiveCuratedEntitiesForPaper(p, 'genes');
+            const rawDiseases = getActiveCuratedEntitiesForPaper(p, 'diseases');
+            const rawPathogens = getActiveCuratedEntitiesForPaper(p, 'pathogens');
+            const rawAntibiotics = getActiveCuratedEntitiesForPaper(p, 'antibiotics');
+
+            const modeLabel = globalCurationMode === 'human_verified' ? 'Human Verified' : (globalCurationMode === 'antigravity' ? 'Antigravity AI' : (globalCurationMode === 'review1' ? 'Auto Review1' : 'Curated'));
 
             detailsBox.innerHTML = `
                 <div class="space-y-3.5">
@@ -1864,28 +3286,28 @@
                     </div>
 
                     <div class="space-y-1">
-                        <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Curated Genes</span>
+                        <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">${modeLabel} Genes</span>
                         <div class="flex flex-wrap gap-1">
                             ${rawGenes.length > 0 ? rawGenes.map(g => `<span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.5 rounded text-[10px] font-medium">${g}</span>`).join('') : '<span class="text-[10px] text-slate-400 italic">None</span>'}
                         </div>
                     </div>
 
                     <div class="space-y-1">
-                        <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Curated Diseases</span>
+                        <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">${modeLabel} Diseases</span>
                         <div class="flex flex-wrap gap-1">
                             ${rawDiseases.length > 0 ? rawDiseases.map(d => `<span class="bg-rose-50 text-rose-700 border border-rose-200 px-1.5 py-0.5 rounded text-[10px] font-medium">${d}</span>`).join('') : '<span class="text-[10px] text-slate-400 italic">None</span>'}
                         </div>
                     </div>
 
                     <div class="space-y-1">
-                        <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Curated Pathogens</span>
+                        <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">${modeLabel} Pathogens</span>
                         <div class="flex flex-wrap gap-1">
                             ${rawPathogens.length > 0 ? rawPathogens.map(pat => `<span class="bg-blue-50 text-blue-700 border border-blue-200 px-1.5 py-0.5 rounded text-[10px] font-medium">${pat}</span>`).join('') : '<span class="text-[10px] text-slate-400 italic">None</span>'}
                         </div>
                     </div>
 
                     <div class="space-y-1">
-                        <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">Curated Antibiotics</span>
+                        <span class="text-[9px] uppercase font-bold text-slate-400 tracking-wider block">${modeLabel} Antibiotics</span>
                         <div class="flex flex-wrap gap-1">
                             ${rawAntibiotics.length > 0 ? rawAntibiotics.map(a => `<span class="bg-amber-50 text-amber-700 border border-amber-200 px-1.5 py-0.5 rounded text-[10px] font-medium">${a}</span>`).join('') : '<span class="text-[10px] text-slate-400 italic">None</span>'}
                         </div>
@@ -1917,7 +3339,6 @@
             currentModalPaper = paper;
             document.getElementById('paper-modal').classList.remove('hidden');
 
-            // Render Header and Metadata
             document.getElementById('modal-paper-id').innerText = `Composite Identifier (PMCID_PMID): ${paper.pmcid_pmid || 'NaN_NaN'}`;
             document.getElementById('modal-title').innerText = paper.title || 'Untitled Document';
             document.getElementById('modal-title').title = paper.title || '';
@@ -1929,7 +3350,6 @@
             document.getElementById('modal-year').innerText = paper.year || 'Unknown';
             document.getElementById('modal-affiliation').innerText = parseListField(paper.affiliationinfo).join('\n') || 'None recorded.';
 
-            // Keywords rendering
             const kwContainer = document.getElementById('modal-keywords-container');
             const kwDiv = document.getElementById('modal-keywords');
             kwDiv.innerHTML = '';
@@ -1943,7 +3363,6 @@
                 kwContainer.classList.add('hidden');
             }
 
-            // MeSH Headings rendering
             const meshContainer = document.getElementById('modal-mesh-container');
             const meshDiv = document.getElementById('modal-mesh');
             meshDiv.innerHTML = '';
@@ -1957,20 +3376,18 @@
                 meshContainer.classList.add('hidden');
             }
 
-            // Entity Matrices (Same colors as inspector grid)
-            renderCategoryMatrixReplica('genes', parseListField(paper.extracted_genes), parseListField(paper.curated_genes));
-            renderCategoryMatrixReplica('diseases', parseListField(paper.extracted_diseases), parseListField(paper.curated_diseases));
-            renderCategoryMatrixReplica('pathogens', parseListField(paper.extracted_pathogens), parseListField(paper.curated_pathogens));
-            renderCategoryMatrixReplica('antibiotics', parseListField(paper.extracted_chemicals), parseListField(paper.curated_antibiotics));
+            renderCategoryMatrixReplica('genes', parseListField(paper.extracted_genes), getActiveCuratedEntitiesForPaper(paper, 'genes'));
+            renderCategoryMatrixReplica('diseases', parseListField(paper.extracted_diseases), getActiveCuratedEntitiesForPaper(paper, 'diseases'));
+            renderCategoryMatrixReplica('pathogens', parseListField(paper.extracted_pathogens), getActiveCuratedEntitiesForPaper(paper, 'pathogens'));
+            renderCategoryMatrixReplica('antibiotics', parseListField(paper.extracted_chemicals), getActiveCuratedEntitiesForPaper(paper, 'antibiotics'));
 
-            // Default Modal Tab to Abstract
             switchModalTab('abstract');
         }
 
         function closePaperModal() {
             document.getElementById('paper-modal').classList.add('hidden');
             const fviewer = document.getElementById('fulltext-viewer');
-            fviewer.innerHTML = ''; // clear viewer contents (disconnect active pdf iframes/text)
+            fviewer.innerHTML = '';
             currentModalPaper = null;
         }
 
@@ -1992,7 +3409,6 @@
                 panelAbstract.classList.add('hidden');
                 panelFulltext.classList.remove('hidden');
 
-                // Trigger lazy full text parsing engine
                 resolveAndRenderFullText();
             }
         }
@@ -2030,7 +3446,6 @@
             if (!currentModalPaper) return;
             const pmid = parseInt(currentModalPaper.pmid);
 
-            // Helper to render fallback pdf iframes
             const renderPdfFallback = () => {
                 viewer.innerHTML = `
                     <div class="h-full flex flex-col space-y-2">
@@ -2044,7 +3459,6 @@
                 loader.classList.add('hidden');
             };
 
-            // 1. Fetch JSON file and Cache
             if (!fulltextArticlesCache) {
                 try {
                     const response = await fetch('viewdata/fulltext-articles.json');
@@ -2060,11 +3474,9 @@
                 }
             }
 
-            // 2. Search PMID in JSON Cache Array
             const targetArticle = fulltextArticlesCache.find(item => parseInt(item.pmid) === pmid);
 
             if (targetArticle && targetArticle.fulltext && targetArticle.fulltext.trim() !== "" && targetArticle.fulltext.trim() !== "PMCID not found.") {
-                // Render nicely structured Reader View (Word-processor Paper Sheet Simulator)
                 const paragraphs = targetArticle.fulltext.split('\n\n').filter(p => p.trim() !== '');
                 let formattedText = paragraphs.map(p => `
                     <p class="font-serif text-[13px] md:text-sm text-slate-800 leading-relaxed text-justify mb-5 indent-6">
@@ -2073,17 +3485,16 @@
                 `).join('');
 
                 viewer.innerHTML = `
-                    <div class="bg-slate-100/80 p-4 md:p-8 rounded-xl border border-slate-200 min-h-[600px] flex justify-center items-start shadow-inner">
-                        <!-- Word Document Paper Simulator Sheet -->
+                    <div class="bg-slate-100/80 p-4 md:p-8 rounded-xl border border-slate-200 min-h-[600px] flex flex-col items-center shadow-inner">
+                        <div class="w-full max-w-2xl bg-slate-900 text-white px-5 py-3 rounded-lg mb-4 flex flex-wrap items-center justify-between gap-2 text-xs font-semibold shadow-md">
+                            <span class="flex items-center gap-2"><i class="fa-solid fa-user-check text-emerald-400"></i> Active Curation Mode: <strong class="text-emerald-300">Option 4: Human Verified (_human_verified)</strong></span>
+                            <span class="text-[10px] text-slate-300 bg-slate-800 px-2.5 py-1 rounded-full border border-slate-700">PubMed Manuscript Reader</span>
+                        </div>
                         <div class="bg-white max-w-2xl w-full px-8 md:px-12 py-12 md:py-16 shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-slate-200/80 rounded-sm relative" style="font-family: Georgia, Cambria, 'Times New Roman', serif;">
-
-                            <!-- Header running ruler -->
                             <div class="border-b border-slate-300 pb-2 mb-6 flex justify-between items-center text-[10px] text-slate-400 font-sans tracking-wide">
                                 <span class="uppercase font-semibold text-indigo-600">Preprint Full-Text manuscript reader</span>
                                 <span>Page 1 / 1</span>
                             </div>
-
-                            <!-- Document Meta Header -->
                             <div class="mb-8 font-sans">
                                 <h4 class="text-sm font-bold text-slate-900 border-l-2 border-indigo-600 pl-2 leading-snug">${currentModalPaper.title || 'Untitled Document'}</h4>
                                 <div class="mt-2 text-[11px] text-slate-500 space-y-0.5">
@@ -2091,13 +3502,9 @@
                                     <p><strong>PMID:</strong> ${currentModalPaper.pmid || 'N/A'} | <strong>PMCID:</strong> ${currentModalPaper.pmcid || 'N/A'} | <strong>Country:</strong> ${currentModalPaper.country || 'N/A'}</p>
                                 </div>
                             </div>
-
-                            <!-- Main Body Text -->
                             <div class="prose prose-slate max-w-none">
                                 ${formattedText}
                             </div>
-
-                            <!-- Document Footer Ruler -->
                             <div class="border-t border-slate-200 pt-3 mt-8 text-center text-[10px] text-slate-400 font-sans">
                                 <p>© BioExtract Analytics Full-Text Retrieval Pipeline. Mapped from Pubmed Open-Access APIs.</p>
                             </div>
@@ -2106,7 +3513,6 @@
                 `;
                 loader.classList.add('hidden');
             } else {
-                // If not matched or matches PMC negative search block, render pdf file in iframe
                 renderPdfFallback();
             }
         }
@@ -2181,6 +3587,474 @@
                 .catch(err => {
                     container.innerHTML = `<div class="text-rose-500 text-xs font-bold p-8 text-center bg-rose-50 rounded-xl border border-rose-100"><i class="fa-solid fa-circle-exclamation text-2xl mb-2 block"></i> Error loading flowchart:<br/>${err.message}</div>`;
                 });
+        }
+
+        // ================= DOMINANT ENTITIES & INTERACTIVE CROSS-MAPPING LOGIC =================
+        let dominantSelectedEntity = null;
+
+        function populateDominantCountryFilter() {
+            const select = document.getElementById('dominant-filter-country');
+            if (!select) return;
+            select.innerHTML = '<option value="">All Countries (Default)</option>';
+
+            const countries = new Set();
+            if (datasets.combined) {
+                datasets.combined.forEach(p => {
+                    if (p.country && String(p.country).trim() !== '') {
+                        countries.add(String(p.country).trim());
+                    }
+                });
+            }
+
+            Array.from(countries).sort().forEach(country => {
+                select.innerHTML += `<option value="${country}">${country}</option>`;
+            });
+        }
+
+        function getPapersForDominantScope() {
+            if (!datasets.combined) return [];
+            const countryFilter = document.getElementById('dominant-filter-country')?.value || '';
+            if (!countryFilter) return datasets.combined;
+            return datasets.combined.filter(p => String(p.country || '').trim() === countryFilter);
+        }
+
+        function renderDominantInterface() {
+            const papersScope = getPapersForDominantScope();
+
+            const counts = {
+                gene: {},
+                pathogen: {},
+                disease: {},
+                antibiotic: {}
+            };
+
+            papersScope.forEach(p => {
+                const genes = getActiveCuratedEntitiesForPaper(p, 'genes');
+                const pathogens = getActiveCuratedEntitiesForPaper(p, 'pathogens');
+                const diseases = getActiveCuratedEntitiesForPaper(p, 'diseases');
+                const antibiotics = getActiveCuratedEntitiesForPaper(p, 'antibiotics');
+
+                genes.forEach(g => { counts.gene[g] = (counts.gene[g] || 0) + 1; });
+                pathogens.forEach(pat => { counts.pathogen[pat] = (counts.pathogen[pat] || 0) + 1; });
+                diseases.forEach(d => { counts.disease[d] = (counts.disease[d] || 0) + 1; });
+                antibiotics.forEach(a => { counts.antibiotic[a] = (counts.antibiotic[a] || 0) + 1; });
+            });
+
+            ['gene', 'pathogen', 'disease', 'antibiotic'].forEach(type => {
+                const totalUnique = Object.keys(counts[type]).length;
+                const badge = document.getElementById(`badge-count-${type}`);
+                if (badge) badge.innerText = totalUnique.toLocaleString();
+            });
+
+            renderDominantColumn('gene', counts.gene);
+            renderDominantColumn('pathogen', counts.pathogen);
+            renderDominantColumn('disease', counts.disease);
+            renderDominantColumn('antibiotic', counts.antibiotic);
+
+            if (dominantSelectedEntity) {
+                renderDominantAssociationsAndPapers(dominantSelectedEntity.type, dominantSelectedEntity.value);
+            } else {
+                renderDominantOverviewState();
+            }
+        }
+
+        function renderDominantColumn(type, countMap) {
+            const container = document.getElementById(`dominant-${type}s-list`);
+            if (!container) return;
+            container.innerHTML = '';
+
+            const sorted = Object.entries(countMap).sort((a, b) => b[1] - a[1]);
+
+            if (sorted.length === 0) {
+                container.innerHTML = `<span class="text-[11px] text-slate-400 italic block text-center mt-8">No ${type}s found</span>`;
+                return;
+            }
+
+            const themeClasses = {
+                gene: { bg: 'bg-emerald-100/60', text: 'text-emerald-800', border: 'border-emerald-200', active: 'bg-emerald-600 text-white font-bold shadow-sm' },
+                pathogen: { bg: 'bg-blue-100/60', text: 'text-blue-800', border: 'border-blue-200', active: 'bg-blue-600 text-white font-bold shadow-sm' },
+                disease: { bg: 'bg-rose-100/60', text: 'text-rose-800', border: 'border-rose-200', active: 'bg-rose-600 text-white font-bold shadow-sm' },
+                antibiotic: { bg: 'bg-amber-100/60', text: 'text-amber-800', border: 'border-amber-200', active: 'bg-amber-600 text-white font-bold shadow-sm' }
+            };
+
+            const theme = themeClasses[type];
+
+            sorted.forEach(([name, count], index) => {
+                const isSelected = dominantSelectedEntity && dominantSelectedEntity.type === type && dominantSelectedEntity.value.toLowerCase() === name.toLowerCase();
+
+                const div = document.createElement('div');
+                div.className = isSelected ?
+                    `p-2 rounded-lg cursor-pointer transition flex items-center justify-between text-xs ${theme.active}` :
+                    `p-2 rounded-lg cursor-pointer transition flex items-center justify-between text-xs bg-white hover:${theme.bg} border border-slate-100 shadow-2xs group`;
+
+                div.setAttribute('data-name', name.toLowerCase());
+                div.onclick = () => selectDominantEntity(type, name);
+
+                div.innerHTML = `
+                    <div class="flex items-center gap-2 truncate pr-1">
+                        <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'}">#${index + 1}</span>
+                        <span class="font-medium truncate ${isSelected ? 'text-white' : 'text-slate-800 group-hover:' + theme.text}">${name}</span>
+                    </div>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${isSelected ? 'bg-white/20 text-white' : theme.bg + ' ' + theme.text}">${count}</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function filterDominantColumns(type) {
+            const query = (document.getElementById(`dominant-search-${type}`)?.value || '').toLowerCase();
+            const container = document.getElementById(`dominant-${type}s-list`);
+            if (!container) return;
+
+            const items = container.children;
+            for (let i = 0; i < items.length; i++) {
+                const name = items[i].getAttribute('data-name') || '';
+                if (name.includes(query)) {
+                    items[i].classList.remove('hidden');
+                } else {
+                    items[i].classList.add('hidden');
+                }
+            }
+        }
+
+        function selectDominantEntity(type, value) {
+            if (dominantSelectedEntity && dominantSelectedEntity.type === type && dominantSelectedEntity.value.toLowerCase() === value.toLowerCase()) {
+                resetDominantSelection();
+                return;
+            }
+
+            dominantSelectedEntity = { type, value };
+            renderDominantInterface();
+        }
+
+        function resetDominantSelection() {
+            dominantSelectedEntity = null;
+            renderDominantInterface();
+        }
+
+        function renderDominantOverviewState() {
+            const banner = document.getElementById('dominant-selection-banner');
+            if (banner) {
+                banner.className = "px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-slate-600 text-xs font-semibold flex items-center gap-2";
+                banner.innerHTML = `<span class="w-2 h-2 rounded-full bg-slate-400"></span><span>Overview (No Entity Selected)</span>`;
+            }
+
+            ['genes', 'pathogens', 'diseases', 'antibiotics'].forEach(cat => {
+                const container = document.getElementById(`dominant-related-${cat}`);
+                if (container) container.innerHTML = `<span class="text-slate-400 italic text-[10px]">Select an entity above to map related ${cat}.</span>`;
+            });
+
+            const papersGrid = document.getElementById('dominant-papers-grid');
+            const placeholder = document.getElementById('dominant-papers-placeholder');
+            const countBadge = document.getElementById('dominant-papers-count-badge');
+
+            if (papersGrid) { papersGrid.innerHTML = ''; papersGrid.classList.add('hidden'); }
+            if (placeholder) placeholder.classList.remove('hidden');
+            if (countBadge) countBadge.innerText = '0 Papers';
+        }
+
+        function renderDominantAssociationsAndPapers(type, value) {
+            const scopePapers = getPapersForDominantScope();
+
+            const matchingPapers = scopePapers.filter(p => {
+                const items = getActiveCuratedEntitiesForPaper(p, type === 'antibiotic' ? 'antibiotics' : type + 's');
+                return items.some(x => x.toLowerCase() === value.toLowerCase());
+            });
+
+            const banner = document.getElementById('dominant-selection-banner');
+            if (banner) {
+                const typeLabels = { gene: 'Gene', pathogen: 'Pathogen', disease: 'Disease', antibiotic: 'Antibiotic' };
+                const badgeTheme = { gene: 'bg-emerald-500', pathogen: 'bg-blue-500', disease: 'bg-rose-500', antibiotic: 'bg-amber-500' };
+
+                banner.className = "px-3 py-1.5 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-900 text-xs font-bold flex items-center gap-2 shadow-2xs";
+                banner.innerHTML = `
+                    <span class="w-2 h-2 rounded-full ${badgeTheme[type]} animate-pulse"></span>
+                    <span>Selected: <span class="text-indigo-600 font-extrabold">${value}</span> (${typeLabels[type]}) • Found in ${matchingPapers.length} Publication${matchingPapers.length === 1 ? '' : 's'}</span>
+                `;
+            }
+
+            const relatedCounts = {
+                genes: {},
+                pathogens: {},
+                diseases: {},
+                antibiotics: {}
+            };
+
+            matchingPapers.forEach(p => {
+                getActiveCuratedEntitiesForPaper(p, 'genes').forEach(g => { relatedCounts.genes[g] = (relatedCounts.genes[g] || 0) + 1; });
+                getActiveCuratedEntitiesForPaper(p, 'pathogens').forEach(pat => { relatedCounts.pathogens[pat] = (relatedCounts.pathogens[pat] || 0) + 1; });
+                getActiveCuratedEntitiesForPaper(p, 'diseases').forEach(d => { relatedCounts.diseases[d] = (relatedCounts.diseases[d] || 0) + 1; });
+                getActiveCuratedEntitiesForPaper(p, 'antibiotics').forEach(a => { relatedCounts.antibiotics[a] = (relatedCounts.antibiotics[a] || 0) + 1; });
+            });
+
+            const catThemes = {
+                genes: { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200' },
+                pathogens: { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200' },
+                diseases: { bg: 'bg-rose-50', text: 'text-rose-700', border: 'border-rose-200' },
+                antibiotics: { bg: 'bg-amber-50', text: 'text-amber-700', border: 'border-amber-200' }
+            };
+
+            ['genes', 'pathogens', 'diseases', 'antibiotics'].forEach(cat => {
+                const container = document.getElementById(`dominant-related-${cat}`);
+                if (!container) return;
+                container.innerHTML = '';
+
+                const isSelfCat = (type === 'gene' && cat === 'genes') ||
+                    (type === 'pathogen' && cat === 'pathogens') ||
+                    (type === 'disease' && cat === 'diseases') ||
+                    (type === 'antibiotic' && cat === 'antibiotics');
+
+                const sorted = Object.entries(relatedCounts[cat])
+                    .filter(([name]) => !isSelfCat || name.toLowerCase() !== value.toLowerCase())
+                    .sort((a, b) => b[1] - a[1]);
+
+                if (sorted.length === 0) {
+                    container.innerHTML = `<span class="text-slate-400 italic text-[10px]">No co-occurring ${cat}</span>`;
+                } else {
+                    const theme = catThemes[cat];
+                    sorted.forEach(([name, count]) => {
+                        const pct = Math.round((count / matchingPapers.length) * 100);
+                        container.innerHTML += `
+                            <span class="inline-flex items-center gap-1 ${theme.bg} ${theme.text} border ${theme.border} px-2 py-0.5 rounded text-[10px] font-semibold" title="${count} of ${matchingPapers.length} papers (${pct}%)">
+                                <span>${name}</span>
+                                <span class="bg-white/80 px-1 py-0.2 rounded text-[9px] font-bold">${count}</span>
+                            </span>
+                        `;
+                    });
+                }
+            });
+
+            const papersGrid = document.getElementById('dominant-papers-grid');
+            const placeholder = document.getElementById('dominant-papers-placeholder');
+            const countBadge = document.getElementById('dominant-papers-count-badge');
+
+            if (countBadge) countBadge.innerText = `${matchingPapers.length} Paper${matchingPapers.length === 1 ? '' : 's'}`;
+
+            if (matchingPapers.length === 0) {
+                if (papersGrid) { papersGrid.innerHTML = ''; papersGrid.classList.add('hidden'); }
+                if (placeholder) placeholder.classList.remove('hidden');
+            } else {
+                if (placeholder) placeholder.classList.add('hidden');
+                if (papersGrid) {
+                    papersGrid.classList.remove('hidden');
+                    papersGrid.innerHTML = '';
+
+                    matchingPapers.forEach(p => {
+                        let parsedAuthors = parseListField(p.authorlist);
+                        let authorDisplayStr = parsedAuthors.length > 0 ? parsedAuthors.slice(0, 2).join(', ') : 'Unknown';
+                        if (parsedAuthors.length > 2) authorDisplayStr += ' et al.';
+
+                        papersGrid.innerHTML += `
+                            <div class="p-3 bg-slate-50 hover:bg-indigo-50/40 border border-slate-200 hover:border-indigo-300 rounded-xl transition duration-150 flex flex-col justify-between space-y-2 group">
+                                <div class="space-y-1">
+                                    <div class="flex justify-between items-start gap-1">
+                                        <span class="text-[9px] uppercase font-extrabold tracking-wider text-indigo-600 bg-indigo-100/50 px-1.5 py-0.5 rounded">ID: ${p.pmcid_pmid || 'NaN_NaN'}</span>
+                                        <span class="text-[9px] font-bold text-slate-500 bg-white px-1.5 py-0.5 rounded border border-slate-200">${p.country || 'N/A'}</span>
+                                    </div>
+                                    <h5 class="text-xs font-bold text-slate-800 leading-snug line-clamp-2">${p.title || 'Untitled Document'}</h5>
+                                </div>
+                                <div class="flex justify-between items-center pt-1 border-t border-slate-200/60">
+                                    <span class="text-[10px] text-slate-500">${authorDisplayStr} (${p.year || '2020'})</span>
+                                    <button onclick="openPaperModal('${p.pmcid_pmid}')" class="px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-[9px] font-bold flex items-center gap-1 shadow-2xs transition">
+                                        <i class="fa-solid fa-expand"></i> View
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    });
+                }
+            }
+        }
+
+        // ================= DOMINANT STATISTICS COUNT LOGIC =================
+        let dominantStatsData = {
+            genes: [],
+            pathogens: [],
+            diseases: [],
+            antibiotics: []
+        };
+
+        function populateDominantStatsCountryFilter() {
+            const select = document.getElementById('dominant-stats-filter-country');
+            if (!select) return;
+            select.innerHTML = '<option value="">All Countries (Default)</option>';
+
+            const countries = new Set();
+            if (datasets.combined) {
+                datasets.combined.forEach(p => {
+                    if (p.country && String(p.country).trim() !== '') {
+                        countries.add(String(p.country).trim());
+                    }
+                });
+            }
+
+            Array.from(countries).sort().forEach(country => {
+                select.innerHTML += `<option value="${country}">${country}</option>`;
+            });
+        }
+
+        function getPapersForDominantStatsScope() {
+            if (!datasets.combined) return [];
+            const countryFilter = document.getElementById('dominant-stats-filter-country')?.value || '';
+            if (!countryFilter) return datasets.combined;
+            return datasets.combined.filter(p => String(p.country || '').trim() === countryFilter);
+        }
+
+        function renderDominantStatsInterface() {
+            const papersScope = getPapersForDominantStatsScope();
+
+            const categories = ['genes', 'pathogens', 'diseases', 'antibiotics'];
+
+            categories.forEach(cat => {
+                const counts = {};
+                papersScope.forEach(p => {
+                    const items = getActiveCuratedEntitiesForPaper(p, cat);
+                    items.forEach(item => {
+                        const trimmed = String(item).trim();
+                        if (trimmed && trimmed.toLowerCase() !== 'nan') {
+                            counts[trimmed] = (counts[trimmed] || 0) + 1;
+                        }
+                    });
+                });
+
+                // Group by distinct count
+                const countToEntities = {};
+                Object.entries(counts).forEach(([entity, count]) => {
+                    if (!countToEntities[count]) {
+                        countToEntities[count] = [];
+                    }
+                    countToEntities[count].push(entity);
+                });
+
+                // Sort counts descending
+                const sortedCounts = Object.keys(countToEntities)
+                    .map(Number)
+                    .sort((a, b) => b - a);
+
+                // Build rows: [{ distinctCount: count, csvValues: string, entityCount: number }]
+                const rows = sortedCounts.map(count => {
+                    const sortedEntities = countToEntities[count].sort((a, b) => a.localeCompare(b));
+                    return {
+                        distinctCount: count,
+                        csvValues: sortedEntities.join(', '),
+                        entityCount: sortedEntities.length
+                    };
+                });
+
+                dominantStatsData[cat] = rows;
+
+                // Update summary badges
+                const totalEntities = Object.keys(counts).length;
+                const badge = document.getElementById(`badge-stats-${cat}`);
+                if (badge) badge.innerText = `${totalEntities.toLocaleString()} Distinct Entities`;
+
+                const summaryBadge = document.getElementById(`stats-summary-${cat}`);
+                if (summaryBadge) {
+                    const catName = cat.charAt(0).toUpperCase() + cat.slice(1);
+                    summaryBadge.innerText = `${catName}: ${rows.length} Count Group${rows.length === 1 ? '' : 's'}`;
+                }
+
+                renderDominantStatsTable(cat, rows);
+            });
+        }
+
+        function renderDominantStatsTable(cat, rows) {
+            const tbody = document.getElementById(`dominant-stats-table-${cat}-body`);
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            const themeStyles = {
+                genes: { countBg: 'bg-emerald-100 text-emerald-900 border-emerald-300' },
+                pathogens: { countBg: 'bg-blue-100 text-blue-900 border-blue-300' },
+                diseases: { countBg: 'bg-rose-100 text-rose-900 border-rose-300' },
+                antibiotics: { countBg: 'bg-amber-100 text-amber-900 border-amber-300' }
+            };
+
+            const theme = themeStyles[cat] || { countBg: 'bg-slate-100 text-slate-800 border-slate-300' };
+
+            if (rows.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="2" class="p-6 text-center text-slate-400 italic">No records found for this category.</td></tr>`;
+                return;
+            }
+
+            rows.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition border-b border-slate-100";
+                tr.setAttribute('data-searchable', `${r.distinctCount} ${r.csvValues}`.toLowerCase());
+
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-center font-bold border-r border-slate-100 align-top">
+                        <span class="inline-block px-2.5 py-1 rounded-full text-xs font-extrabold border ${theme.countBg}">
+                            ${r.distinctCount}
+                        </span>
+                        <span class="block text-[9px] text-slate-400 mt-1 font-normal">${r.entityCount} entit${r.entityCount === 1 ? 'y' : 'ies'}</span>
+                    </td>
+                    <td class="py-3 px-4 text-slate-700 leading-relaxed text-xs">
+                        <div class="flex items-start justify-between gap-2">
+                            <span class="break-words flex-1">${r.csvValues}</span>
+                            <button onclick="copyToClipboard('${r.csvValues.replace(/'/g, "\\'")}', this)" title="Copy values" class="text-slate-400 hover:text-indigo-600 p-1 rounded transition">
+                                <i class="fa-regular fa-copy text-xs"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function filterDominantStatsTables() {
+            const query = (document.getElementById('dominant-stats-search')?.value || '').toLowerCase();
+            ['genes', 'pathogens', 'diseases', 'antibiotics'].forEach(cat => {
+                const tbody = document.getElementById(`dominant-stats-table-${cat}-body`);
+                if (!tbody) return;
+                const rows = tbody.querySelectorAll('tr[data-searchable]');
+                rows.forEach(tr => {
+                    const text = tr.getAttribute('data-searchable') || '';
+                    if (text.includes(query)) {
+                        tr.classList.remove('hidden');
+                    } else {
+                        tr.classList.add('hidden');
+                    }
+                });
+            });
+        }
+
+        function copyTableCSV(cat) {
+            const rows = dominantStatsData[cat] || [];
+            if (rows.length === 0) return;
+
+            let csvStr = "Distinct Count,Comma Separated Values\n";
+            rows.forEach(r => {
+                csvStr += `"${r.distinctCount}","${r.csvValues.replace(/"/g, '""')}"\n`;
+            });
+
+            navigator.clipboard.writeText(csvStr).then(() => {
+                alert(`Copied ${cat.toUpperCase()} Dominant Statistics CSV to clipboard!`);
+            }).catch(e => {
+                console.error("Clipboard copy failed:", e);
+            });
+        }
+
+        function exportDominantStatsExcel() {
+            if (typeof XLSX === 'undefined') {
+                alert("SheetJS library is not loaded.");
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+
+            ['genes', 'pathogens', 'diseases', 'antibiotics'].forEach(cat => {
+                const rows = dominantStatsData[cat] || [];
+                const sheetData = rows.map(r => ({
+                    'Distinct Count': r.distinctCount,
+                    'Comma Separated Values': r.csvValues
+                }));
+                const ws = XLSX.utils.json_to_sheet(sheetData);
+                const sheetName = cat.charAt(0).toUpperCase() + cat.slice(1);
+                XLSX.utils.book_append_sheet(wb, ws, sheetName);
+            });
+
+            XLSX.writeFile(wb, `dominant_statistics_count.xlsx`);
         }
 
         function closeMermaidModal() {
