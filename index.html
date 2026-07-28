@@ -217,53 +217,183 @@
 
         <!-- ================= ANALYTICS TAB CONTENT ================= -->
         <div id="tab-content-analytics" class="space-y-6">
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div
-                    class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-2 flex flex-col justify-between">
+            <!-- 6 Key Executive Metric Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col justify-between space-y-2">
                     <div class="flex justify-between items-center text-slate-400">
-                        <span class="text-xs font-bold tracking-wider uppercase text-slate-400">Total Indexed
-                            Papers</span>
-                        <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><i
-                                class="fa-solid fa-file-lines"></i></div>
+                        <span class="text-[10px] font-extrabold tracking-wider uppercase text-slate-500">Indexed Papers</span>
+                        <div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg"><i class="fa-solid fa-file-lines text-sm"></i></div>
                     </div>
                     <div>
-                        <h3 class="text-3xl font-extrabold" id="stat-total-papers">0</h3>
-                        <p class="text-xs text-slate-500 mt-1">Cross-analyzed with Golden Standard matrices</p>
+                        <h3 class="text-2xl font-black text-slate-900" id="stat-total-papers">0</h3>
+                        <p class="text-[10px] text-slate-500 mt-0.5">PubMed/PMC Publications</p>
                     </div>
                 </div>
 
-                <div
-                    class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-2 flex flex-col justify-between">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col justify-between space-y-2">
                     <div class="flex justify-between items-center text-slate-400">
-                        <span class="text-xs font-bold tracking-wider uppercase text-slate-400">Active Curated
-                            Map</span>
-                        <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg"><i class="fa-solid fa-tag"></i></div>
+                        <span class="text-[10px] font-extrabold tracking-wider uppercase text-slate-500">Distinct Entities</span>
+                        <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg"><i class="fa-solid fa-shapes text-sm"></i></div>
                     </div>
                     <div>
-                        <h3 class="text-3xl font-extrabold" id="stat-total-curations">0</h3>
-                        <p class="text-xs text-slate-500 mt-1" id="stat-curation-mode-label">Mode: Option 4 (Col 5: Human Verified)</p>
+                        <h3 class="text-2xl font-black text-slate-900" id="stat-distinct-entities">0</h3>
+                        <p class="text-[10px] text-slate-500 mt-0.5" id="stat-curation-mode-label">Mode: Option 4 (Human Verified)</p>
                     </div>
                 </div>
 
-                <div
-                    class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-2 flex flex-col justify-between">
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col justify-between space-y-2">
                     <div class="flex justify-between items-center text-slate-400">
-                        <span class="text-xs font-bold tracking-wider uppercase text-slate-400">Global Coverage</span>
-                        <div class="p-2 bg-purple-50 text-purple-600 rounded-lg"><i class="fa-solid fa-globe"></i></div>
+                        <span class="text-[10px] font-extrabold tracking-wider uppercase text-slate-500">Human Verified %</span>
+                        <div class="p-2 bg-teal-50 text-teal-600 rounded-lg"><i class="fa-solid fa-user-check text-sm"></i></div>
                     </div>
                     <div>
-                        <h3 class="text-3xl font-extrabold" id="stat-total-countries">0</h3>
-                        <p class="text-xs text-slate-500 mt-1">Sovereign geographic sources identified</p>
+                        <h3 class="text-2xl font-black text-slate-900" id="stat-human-verified-rate">0%</h3>
+                        <p class="text-[10px] text-slate-500 mt-0.5" id="stat-human-verified-count">0 Gold-Standard Items</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col justify-between space-y-2">
+                    <div class="flex justify-between items-center text-slate-400">
+                        <span class="text-[10px] font-extrabold tracking-wider uppercase text-slate-500">Total Dictionary Map</span>
+                        <div class="p-2 bg-amber-50 text-amber-600 rounded-lg"><i class="fa-solid fa-book-bookmark text-sm"></i></div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-black text-slate-900" id="stat-total-mappings">0</h3>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Extraction-to-Curation Pairs</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col justify-between space-y-2">
+                    <div class="flex justify-between items-center text-slate-400">
+                        <span class="text-[10px] font-extrabold tracking-wider uppercase text-slate-500">4-Tuple Pathways</span>
+                        <div class="p-2 bg-purple-50 text-purple-600 rounded-lg"><i class="fa-solid fa-diagram-project text-sm"></i></div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-black text-slate-900" id="stat-total-tuples">0</h3>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Co-occurring Bio-Pathways</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col justify-between space-y-2">
+                    <div class="flex justify-between items-center text-slate-400">
+                        <span class="text-[10px] font-extrabold tracking-wider uppercase text-slate-500">Global Coverage</span>
+                        <div class="p-2 bg-rose-50 text-rose-600 rounded-lg"><i class="fa-solid fa-globe text-sm"></i></div>
+                    </div>
+                    <div>
+                        <h3 class="text-2xl font-black text-slate-900" id="stat-total-countries">0</h3>
+                        <p class="text-[10px] text-slate-500 mt-0.5">Sovereign Research Nations</p>
                     </div>
                 </div>
             </div>
 
+            <!-- Category Specific Domain Breakdown Cards (4 Cards Grid) -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Genes Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-emerald-200 p-4 space-y-3">
+                    <div class="flex items-center justify-between border-b border-emerald-100 pb-2">
+                        <span class="font-extrabold text-xs text-emerald-800 flex items-center gap-1.5">
+                            <i class="fa-solid fa-dna text-emerald-600"></i> Genes (ARG Curation)
+                        </span>
+                        <span id="overview-badge-genes-rows" class="text-[10px] font-bold px-2 py-0.5 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-200">0 Rows</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                            <span class="text-[10px] text-slate-400 block font-medium">Distinct Terms</span>
+                            <span id="overview-genes-distinct" class="font-extrabold text-slate-800 text-sm">0</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 block font-medium">Human Verified</span>
+                            <span id="overview-genes-human" class="font-extrabold text-emerald-700 text-sm">0</span>
+                        </div>
+                    </div>
+                    <div class="bg-emerald-50/50 p-2 rounded-lg border border-emerald-100 text-[11px] text-emerald-900 flex justify-between items-center">
+                        <span class="text-[10px] text-slate-500 font-semibold">Top Dominant:</span>
+                        <span id="overview-genes-top" class="font-bold text-right truncate pl-1">Loading...</span>
+                    </div>
+                </div>
+
+                <!-- Pathogens Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-blue-200 p-4 space-y-3">
+                    <div class="flex items-center justify-between border-b border-blue-100 pb-2">
+                        <span class="font-extrabold text-xs text-blue-800 flex items-center gap-1.5">
+                            <i class="fa-solid fa-bug text-blue-600"></i> Pathogens Taxonomy
+                        </span>
+                        <span id="overview-badge-pathogens-rows" class="text-[10px] font-bold px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full border border-blue-200">0 Rows</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                            <span class="text-[10px] text-slate-400 block font-medium">Distinct Terms</span>
+                            <span id="overview-pathogens-distinct" class="font-extrabold text-slate-800 text-sm">0</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 block font-medium">Human Verified</span>
+                            <span id="overview-pathogens-human" class="font-extrabold text-blue-700 text-sm">0</span>
+                        </div>
+                    </div>
+                    <div class="bg-blue-50/50 p-2 rounded-lg border border-blue-100 text-[11px] text-blue-900 flex justify-between items-center">
+                        <span class="text-[10px] text-slate-500 font-semibold">Top Dominant:</span>
+                        <span id="overview-pathogens-top" class="font-bold text-right truncate pl-1">Loading...</span>
+                    </div>
+                </div>
+
+                <!-- Diseases Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-rose-200 p-4 space-y-3">
+                    <div class="flex items-center justify-between border-b border-rose-100 pb-2">
+                        <span class="font-extrabold text-xs text-rose-800 flex items-center gap-1.5">
+                            <i class="fa-solid fa-heart-pulse text-rose-600"></i> Diseases Vocabulary
+                        </span>
+                        <span id="overview-badge-diseases-rows" class="text-[10px] font-bold px-2 py-0.5 bg-rose-50 text-rose-700 rounded-full border border-rose-200">0 Rows</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                            <span class="text-[10px] text-slate-400 block font-medium">Distinct Terms</span>
+                            <span id="overview-diseases-distinct" class="font-extrabold text-slate-800 text-sm">0</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 block font-medium">Human Verified</span>
+                            <span id="overview-diseases-human" class="font-extrabold text-rose-700 text-sm">0</span>
+                        </div>
+                    </div>
+                    <div class="bg-rose-50/50 p-2 rounded-lg border border-rose-100 text-[11px] text-rose-900 flex justify-between items-center">
+                        <span class="text-[10px] text-slate-500 font-semibold">Top Dominant:</span>
+                        <span id="overview-diseases-top" class="font-bold text-right truncate pl-1">Loading...</span>
+                    </div>
+                </div>
+
+                <!-- Antibiotics Card -->
+                <div class="bg-white rounded-xl shadow-sm border border-amber-200 p-4 space-y-3">
+                    <div class="flex items-center justify-between border-b border-amber-100 pb-2">
+                        <span class="font-extrabold text-xs text-amber-800 flex items-center gap-1.5">
+                            <i class="fa-solid fa-capsules text-amber-600"></i> Antibiotics Map
+                        </span>
+                        <span id="overview-badge-antibiotics-rows" class="text-[10px] font-bold px-2 py-0.5 bg-amber-50 text-amber-700 rounded-full border border-amber-200">0 Rows</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                            <span class="text-[10px] text-slate-400 block font-medium">Distinct Terms</span>
+                            <span id="overview-antibiotics-distinct" class="font-extrabold text-slate-800 text-sm">0</span>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-slate-400 block font-medium">Human Verified</span>
+                            <span id="overview-antibiotics-human" class="font-extrabold text-amber-700 text-sm">0</span>
+                        </div>
+                    </div>
+                    <div class="bg-amber-50/50 p-2 rounded-lg border border-amber-100 text-[11px] text-amber-900 flex justify-between items-center">
+                        <span class="text-[10px] text-slate-500 font-semibold">Top Dominant:</span>
+                        <span id="overview-antibiotics-top" class="font-bold text-right truncate pl-1">Loading...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4 lg:col-span-2">
-                    <div>
-                        <h4 class="font-bold text-slate-800 text-sm">Geographical Demographics of AMR & Gut Studies</h4>
-                        <p class="text-xs text-slate-400">Most represented research nodes identified across publications
-                        </p>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm">Geographical Demographics of AMR & Gut Studies</h4>
+                            <p class="text-xs text-slate-400">Most represented research nodes identified across publications</p>
+                        </div>
+                        <span class="text-[10px] font-bold px-2.5 py-1 bg-slate-100 text-slate-700 rounded-full">Global Distribution</span>
                     </div>
                     <div class="h-64 relative">
                         <canvas id="chart-geography"></canvas>
@@ -271,9 +401,11 @@
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4">
-                    <div>
-                        <h4 class="font-bold text-slate-800 text-sm">Distribution of Mapped Entity Categories</h4>
-                        <p class="text-xs text-slate-400">Reference density across active curated classes</p>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-sm">Distribution of Mapped Entity Categories</h4>
+                            <p class="text-xs text-slate-400">Reference density across active curated classes</p>
+                        </div>
                     </div>
                     <div class="h-64 relative flex items-center justify-center">
                         <canvas id="chart-entities"></canvas>
@@ -282,8 +414,7 @@
             </div>
 
             <!-- Download Hub layout -->
-            <div
-                class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4 flex flex-col justify-between">
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5 space-y-4 flex flex-col justify-between">
                 <div>
                     <h4 class="font-bold text-slate-800 text-sm">Download Central Hub</h4>
                     <p class="text-xs text-slate-400">Download clean, high-confidence structured assets directly</p>
@@ -295,8 +426,7 @@
                             <h5 class="text-xs font-bold text-slate-700">Combined Extracted Data</h5>
                             <span class="text-[10px] text-slate-400 block mt-0.5">Excel Sheet (.xlsx)</span>
                         </div>
-                        <div
-                            class="p-2 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-lg transition">
+                        <div class="p-2 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-lg transition">
                             <i class="fa-solid fa-download"></i>
                         </div>
                     </button>
@@ -306,8 +436,7 @@
                             <h5 class="text-xs font-bold text-slate-700">Antibiotics Curation Sheet</h5>
                             <span class="text-[10px] text-slate-400 block mt-0.5">Chemical/Antibiotic Map</span>
                         </div>
-                        <div
-                            class="p-2 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-lg transition">
+                        <div class="p-2 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-lg transition">
                             <i class="fa-solid fa-download"></i>
                         </div>
                     </button>
@@ -317,8 +446,7 @@
                             <h5 class="text-xs font-bold text-slate-700">Diseases Curation Sheet</h5>
                             <span class="text-[10px] text-slate-400 block mt-0.5">Disease Vocabulary Map</span>
                         </div>
-                        <div
-                            class="p-2 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-lg transition">
+                        <div class="p-2 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-lg transition">
                             <i class="fa-solid fa-download"></i>
                         </div>
                     </button>
@@ -328,8 +456,7 @@
                             <h5 class="text-xs font-bold text-slate-700">Genes Curation Sheet</h5>
                             <span class="text-[10px] text-slate-400 block mt-0.5">Microbiome Genetic Map</span>
                         </div>
-                        <div
-                            class="p-2 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-lg transition">
+                        <div class="p-2 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-lg transition">
                             <i class="fa-solid fa-download"></i>
                         </div>
                     </button>
@@ -339,8 +466,7 @@
                             <h5 class="text-xs font-bold text-slate-700">Pathogens Curation Sheet</h5>
                             <span class="text-[10px] text-slate-400 block mt-0.5">Taxonomy Reference Map</span>
                         </div>
-                        <div
-                            class="p-2 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-lg transition">
+                        <div class="p-2 bg-indigo-50 group-hover:bg-indigo-600 text-indigo-600 group-hover:text-white rounded-lg transition">
                             <i class="fa-solid fa-download"></i>
                         </div>
                     </button>
@@ -2086,19 +2212,104 @@
 
         function calculateOverallStats() {
             const totalPapers = datasets.combined ? datasets.combined.length : 0;
-            document.getElementById('stat-total-papers').innerText = totalPapers.toLocaleString();
+            const paperEl = document.getElementById('stat-total-papers');
+            if (paperEl) paperEl.innerText = totalPapers.toLocaleString();
 
-            let totalCurated = 0;
-            ['antibiotics', 'diseases', 'genes', 'pathogens'].forEach(cat => {
+            let totalMappings = 0;
+            let humanVerifiedCount = 0;
+            const distinctEntitiesSet = new Set();
+
+            const categories = ['genes', 'pathogens', 'diseases', 'antibiotics'];
+
+            categories.forEach(cat => {
                 const rows = datasets[cat] || [];
+                totalMappings += rows.length;
+
+                let catHumanCount = 0;
+                const catDistinctSet = new Set();
+
+                const keys = rows.length > 0 ? Object.keys(rows[0]) : [];
+                const colHuman = getHumanVerifiedColKey(keys);
+
                 rows.forEach(r => {
                     const val = getCuratedValueFromRow(r);
                     if (val && val.trim() !== '' && val.toLowerCase() !== 'nan') {
-                        totalCurated++;
+                        distinctEntitiesSet.add(val.trim().toLowerCase());
+                        catDistinctSet.add(val.trim().toLowerCase());
+                    }
+
+                    if (colHuman && r[colHuman] !== undefined && r[colHuman] !== null) {
+                        const hVal = String(r[colHuman]).trim();
+                        if (hVal && hVal.toLowerCase() !== 'nan') {
+                            humanVerifiedCount++;
+                            catHumanCount++;
+                        }
                     }
                 });
+
+                // Update category card metrics
+                const rowBadge = document.getElementById(`overview-badge-${cat}-rows`);
+                if (rowBadge) rowBadge.innerText = `${rows.length.toLocaleString()} Rows`;
+
+                const distinctEl = document.getElementById(`overview-${cat}-distinct`);
+                if (distinctEl) distinctEl.innerText = catDistinctSet.size.toLocaleString();
+
+                const humanEl = document.getElementById(`overview-${cat}-human`);
+                if (humanEl) humanEl.innerText = catHumanCount.toLocaleString();
+
+                // Compute top dominant entity for category
+                const entityCounts = {};
+                if (datasets.combined) {
+                    datasets.combined.forEach(p => {
+                        const items = getActiveCuratedEntitiesForPaper(p, cat);
+                        items.forEach(item => {
+                            const trimmed = String(item).trim();
+                            if (trimmed && trimmed.toLowerCase() !== 'nan') {
+                                entityCounts[trimmed] = (entityCounts[trimmed] || 0) + 1;
+                            }
+                        });
+                    });
+                }
+                const topSorted = Object.entries(entityCounts).sort((a, b) => b[1] - a[1]);
+                const topEl = document.getElementById(`overview-${cat}-top`);
+                if (topEl) {
+                    if (topSorted.length > 0) {
+                        topEl.innerText = `${topSorted[0][0]} (${topSorted[0][1]} papers)`;
+                    } else {
+                        topEl.innerText = 'N/A';
+                    }
+                }
             });
-            document.getElementById('stat-total-curations').innerText = totalCurated.toLocaleString();
+
+            const distinctEl = document.getElementById('stat-distinct-entities');
+            if (distinctEl) distinctEl.innerText = distinctEntitiesSet.size.toLocaleString();
+
+            const humanPct = totalMappings > 0 ? ((humanVerifiedCount / totalMappings) * 100).toFixed(1) : '0';
+            const humanRateEl = document.getElementById('stat-human-verified-rate');
+            if (humanRateEl) humanRateEl.innerText = `${humanPct}%`;
+
+            const humanCountEl = document.getElementById('stat-human-verified-count');
+            if (humanCountEl) humanCountEl.innerText = `${humanVerifiedCount.toLocaleString()} Verified Items`;
+
+            const totalMapEl = document.getElementById('stat-total-mappings');
+            if (totalMapEl) totalMapEl.innerText = totalMappings.toLocaleString();
+
+            // Compute 4-tuple co-occurring pathways count
+            let tupleCount = 0;
+            if (datasets.combined) {
+                datasets.combined.forEach(p => {
+                    const dis = getActiveCuratedEntitiesForPaper(p, 'diseases');
+                    const pat = getActiveCuratedEntitiesForPaper(p, 'pathogens');
+                    const gen = getActiveCuratedEntitiesForPaper(p, 'genes');
+                    const ant = getActiveCuratedEntitiesForPaper(p, 'antibiotics');
+
+                    if (dis.length > 0 && pat.length > 0 && gen.length > 0 && ant.length > 0) {
+                        tupleCount += (dis.length * pat.length * gen.length * ant.length);
+                    }
+                });
+            }
+            const tupleEl = document.getElementById('stat-total-tuples');
+            if (tupleEl) tupleEl.innerText = tupleCount.toLocaleString();
 
             const countries = new Set();
             if (datasets.combined) {
@@ -2108,7 +2319,8 @@
                     }
                 });
             }
-            document.getElementById('stat-total-countries').innerText = countries.size;
+            const countryEl = document.getElementById('stat-total-countries');
+            if (countryEl) countryEl.innerText = countries.size;
         }
 
         // Helper: Convert string '[A, B]' or actual arrays back to flat arrays
