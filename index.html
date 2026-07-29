@@ -1867,8 +1867,12 @@
                 const origText = String(row[keys[0]] || '').trim();
                 if (sheetStored[origText]) {
                     const entry = sheetStored[origText];
-                    row[col4Name] = entry.val;
-                    row.human_verified_updated_at = entry.ts;
+                    const rowTs = parseInt(row.human_verified_updated_at) || 0;
+                    const entryTs = parseInt(entry.ts) || 0;
+                    if (entryTs > rowTs) {
+                        row[col4Name] = entry.val;
+                        row.human_verified_updated_at = entry.ts;
+                    }
                 }
             });
         }
@@ -1975,17 +1979,7 @@
                     const hVal = String(row[colHuman]).trim();
                     if (hVal && hVal.toLowerCase() !== 'nan') return hVal;
                 }
-                const colAG = getAntigravityColKey(keys);
-                if (colAG && row[colAG] !== undefined && row[colAG] !== null) {
-                    const agVal = String(row[colAG]).trim();
-                    if (agVal && agVal.toLowerCase() !== 'nan') return agVal;
-                }
-                const colReview1 = getReview1ColKey(keys);
-                if (colReview1 && row[colReview1] !== undefined && row[colReview1] !== null) {
-                    const rVal = String(row[colReview1]).trim();
-                    if (rVal && rVal.toLowerCase() !== 'nan') return rVal;
-                }
-                return String(row[keys[1]] || '').trim();
+                return '';
             }
 
             if (globalCurationMode === 'antigravity') {
@@ -2053,9 +2047,15 @@
                         resolved.push(...match.split(',').map(s => s.trim()).filter(Boolean));
                     }
                 });
+                if (globalCurationMode === 'human_verified') {
+                    return Array.from(new Set(resolved));
+                }
                 if (resolved.length > 0) return Array.from(new Set(resolved));
             }
 
+            if (globalCurationMode === 'human_verified') {
+                return [];
+            }
             return parseListField(p[curCol]);
         }
 
@@ -2071,7 +2071,8 @@
 
             for (const [key, url] of Object.entries(fileUrls)) {
                 try {
-                    const response = await fetch(url);
+                    const cacheBusterUrl = `${url}?t=${Date.now()}`;
+                    const response = await fetch(cacheBusterUrl);
                     if (!response.ok) throw new Error(`HTTP Error Status: ${response.status}`);
                     const buffer = await response.arrayBuffer();
 
