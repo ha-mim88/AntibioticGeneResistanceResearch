@@ -97,24 +97,43 @@
     </header>
 
     <!-- Pipeline Flowchart Buttons Bar -->
-    <div class="flex flex-wrap gap-2 px-4 md:px-5 py-2.5 bg-slate-100 border-b border-slate-200">
-        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest self-center mr-2">Pipeline
-            Flowcharts:</span>
+    <div class="flex flex-wrap items-center gap-2 px-4 md:px-5 py-2.5 bg-slate-100 border-b border-slate-200 text-xs">
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest self-center mr-1">Pipeline Architecture:</span>
         <button onclick="showMermaidModal('selection and data mining')"
-            class="text-xs font-semibold text-rose-600 hover:text-rose-800 transition flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-rose-100 shadow-sm">
+            class="font-semibold text-rose-600 hover:text-rose-800 transition flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-rose-100 shadow-sm">
             <i class="fa-solid fa-magnifying-glass"></i> Selection & Data Mining
         </button>
         <button onclick="showMermaidModal('data extraction')"
-            class="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-indigo-100 shadow-sm">
+            class="font-semibold text-indigo-600 hover:text-indigo-800 transition flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-indigo-100 shadow-sm">
             <i class="fa-solid fa-gears"></i> Data Extraction
         </button>
         <button onclick="showMermaidModal('extracted data post processing and curation')"
-            class="text-xs font-semibold text-emerald-600 hover:text-emerald-800 transition flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-emerald-100 shadow-sm">
+            class="font-semibold text-emerald-600 hover:text-emerald-800 transition flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-emerald-100 shadow-sm">
             <i class="fa-solid fa-wand-magic-sparkles"></i> Post-Processing & Curation
         </button>
         <button onclick="showMermaidModal('data compilation')"
-            class="text-xs font-semibold text-amber-600 hover:text-amber-800 transition flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-amber-100 shadow-sm">
+            class="font-semibold text-amber-600 hover:text-amber-800 transition flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-amber-100 shadow-sm">
             <i class="fa-solid fa-layer-group"></i> Data Compilation
+        </button>
+
+        <span class="border-l border-slate-300 h-4 mx-1.5 hidden sm:inline-block"></span>
+
+        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest self-center mr-1">Curation Pipelines:</span>
+        <button onclick="showMermaidModal('antibiotic curation review')"
+            class="font-semibold text-teal-600 hover:text-teal-800 transition flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-teal-100 shadow-sm">
+            <i class="fa-solid fa-pills"></i> Antibiotics Review
+        </button>
+        <button onclick="showMermaidModal('disease curation review')"
+            class="font-semibold text-sky-600 hover:text-sky-800 transition flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-sky-100 shadow-sm">
+            <i class="fa-solid fa-virus"></i> Diseases Review
+        </button>
+        <button onclick="showMermaidModal('gene curation review')"
+            class="font-semibold text-purple-600 hover:text-purple-800 transition flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-purple-100 shadow-sm">
+            <i class="fa-solid fa-dna"></i> Genes Review
+        </button>
+        <button onclick="showMermaidModal('pathogen curation review')"
+            class="font-semibold text-rose-600 hover:text-rose-800 transition flex items-center gap-1.5 px-3 py-1 rounded-full bg-white border border-rose-100 shadow-sm">
+            <i class="fa-solid fa-bacterium"></i> Pathogens Review
         </button>
     </div>
 
@@ -3753,6 +3772,257 @@
         mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
         let panZoomInstance = null;
 
+        const EMBEDDED_FLOWCHARTS = {
+            "selection and data mining": `flowchart TD
+    subgraph DATA_MINE [1. Selection & Data Mining]
+        D1[Input Source: DOIs from Excel/JSON] --> D2{DOI available?}
+        D2 -- Yes --> D3[Fetch Metadata from CrossRef API]
+        D2 -- No --> D4[Fetch Metadata from PubMed E-Utils]
+        D3 --> D5[Extract Title, Year, Abstract, DOI]
+        D4 --> D6[Extract PMID, Title, Abstract, MeSH, Authors, Keywords]
+        D5 --> D7[Match with Reference Excel: 'India_Data_*.xlsx']
+        D6 --> D7
+        D7 --> D8[Enrich with Manual Status & EXCEL_ID]
+    end
+
+    subgraph PRE_FILT [2. Preliminary Filtering]
+        F1[Detect Human Relevance:<br/>MeSH contains 'Humans']
+        F2[Detect Geo-Location:<br/>Regex Search in Title/Abstract]
+        F3[Detect Experiment Type:<br/>Identify Clinical/Trial Indicators]
+        D8 --> F1
+        D8 --> F2
+        D8 --> F3
+    end
+
+    subgraph OUTPUT [3. Result Generation]
+        O1[Filter Errors: Missing PMIDs]
+        O2[Label Inclusion Status]
+        O3[Export to 'extractedinfo-pubmed.json']
+        F1 & F2 & F3 --> O1
+        O1 --> O2
+        O2 --> O3
+    end`,
+            "data extraction": `graph TD
+    A[Start] --> B[Load Input Articles JSON]
+    B --> C[Filter & Sort Articles]
+    C --> D{Iterate through Articles}
+    D --> E[Check: Already Processed?]
+    E -- Yes --> D
+    E -- No --> F[Check: Text Length > 100k?]
+    F -- Yes --> D
+    F -- No --> G[Cool Down Wait]
+    G --> H[Call process_research_data]
+    
+    subgraph process_research_data
+        H1[Load Source: PDF/TXT] --> H2{Text Length >= 150k?}
+        H2 -- Yes --> H3[Skip & Return Error]
+        H2 -- No --> H4{Text Length > 54k?}
+        H4 -- Yes --> H5[Split into Chunks 40k size, 2k overlap]
+        H5 --> H6[Step 1: Tree Extraction on each Chunk]
+        H6 --> H7[Combine Chunk Results]
+        H4 -- No --> H8[Step 1: Tree Extraction on Full Text]
+        H7 --> H9[Step 2: Data Extraction to JSON]
+        H8 --> H9[Step 2: Data Extraction to JSON]
+        H9 --> H10[Return Extracted Info]
+    end
+    
+    H --> I{Success?}
+    I -- Yes --> J[Save Result to Output JSON]
+    I -- No --> K[Save Error to Failed JSON]
+    J --> D
+    K --> D
+    D -- End --> L[End]`,
+            "extracted data post processing and curation": `flowchart TD
+    subgraph P_PROC [1. Data Post-Processing]
+        P1[Load Extracted JSONs] --> P2[Combine into single JSON]
+        P2 --> P3[Human Relevance Filtering]
+        P3 --> P4[Generate Statistics]
+        P4 --> P5[Extract Distinct Entities]
+        P5 --> P6[Excel Export for Curation]
+    end
+
+    P_PROC --> C_LLM
+    P_PROC --> G_ADV
+
+    subgraph C_LLM [2. LLM-Based Curation: Pathogens/Diseases/Chemicals]
+        C1[Load Entity Excel] --> C2[<b>Prompt Engineering</b>:<br/>Few-Shot Examples & Strict UMLS Constraints]
+        C2 --> C3[<b>Models</b>:<br/>Nemotron-3-Nano & Gemma-2-9B]
+        C3 --> C4[Rolling Context Normalization]
+        C4 --> C5[Post-process & Clean Output]
+        C5 --> C6[Save Curated Excel]
+    end
+
+    subgraph G_ADV [3. Advanced Gene Curation]
+        G1[<b>Ensemble Extraction</b>:<br/>Nemotron + Gemma Parallel Execution] --> G2[<b>Prompt Engineering</b>:<br/>Chain-of-Thought for ARG Normalization]
+        G2 --> G3[ARG Rule-Based Normalization]
+        G3 --> G4[LLM Complex Case Mapping]
+        G4 --> G5[<b>Validation Layer</b>:<br/>Qwen2-7B with JSON Confidence Check]
+        G5 --> G6[Final Prefix/Duplicate Clean-up]
+    end
+
+    C_LLM --> FIN
+    G_ADV --> FIN
+
+    subgraph FIN [4. Final Output]
+        F[Combined Curated Data Table]
+    end`,
+            "data compilation": `flowchart TD
+    subgraph LOAD [1. Data Loading]
+        L1[Load Curated Excels:<br/>Genes, Diseases, Antibiotics, Pathogens]
+        L2[Load Paper Metadata:<br/>extractedinfo-all-countries.xlsx]
+        L3[Load Raw Extracted Info:<br/>combined_extracted_information.json]
+    end
+
+    subgraph CUR_CLEAN [2. Curated Data Refinement]
+        C1[Filter Genes:<br/>Confidence = 'HIGH'] --> C2[Drop Unwanted Columns]
+        C3[Process Diseases:<br/>Manual Correction Override AI] --> C4[Standardize Column Names]
+        C5[Process Pathogens & Antibiotics:<br/>Rename & Save Final Versions]
+    end
+
+    subgraph JOIN_PREP [3. Join Preparation]
+        J1[Standardize IDs:<br/>Convert PMID/PMCID to String]
+        J2[Filter Metadata:<br/>HumanRelevance = 1]
+        J3[Dictionary Standardization:<br/>Normalize extracted_info Keys]
+        J4[Flatten JSON:<br/>Unpack nested dicts to columns]
+    end
+
+    subgraph MERGE [4. Dual-Key Merge Strategy]
+        M1[Attempt 1:<br/>Left Join on PMID]
+        M2[Attempt 2:<br/>Left Join on PMCID]
+        M3[Combine Results:<br/>Fill PMID-misses with PMCID-matches]
+    end
+
+    subgraph FINAL [5. Final Compilation]
+        F1[Deduplicate Columns]
+        F2[Map Original Entities to Curated Terms]
+        F3[Save Master Dataset:<br/>final_combined_extracted_data.xlsx]
+    end
+
+    LOAD --> CUR_CLEAN
+    LOAD --> JOIN_PREP
+    CUR_CLEAN --> JOIN_PREP
+    JOIN_PREP --> MERGE
+    MERGE --> FINAL`,
+            "antibiotic curation review": `graph TD
+    classDef startEnd fill:#1e293b,stroke:#0f172a,stroke-width:2px,color:#fff,font-weight:bold;
+    classDef process fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#1e3a8a;
+    classDef decision fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#78350f;
+    classDef success fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#064e3b;
+    classDef alert fill:#fff1f2,stroke:#f43f5e,stroke-width:2px,color:#881337;
+
+    Start(["Start: Raw Antibiotic Dataset (2,241 Rows)"]):::startEnd --> Step1["Step 1: Load Text Entities<br/>('original_antibiotics' & 'curated_antibiotics')"]:::process
+
+    Step1 --> DecValid{"Is it a Valid Recognized Antibiotic Drug?<br/>(Check against strict drug dictionary & suffixes)"}:::decision
+    DecValid -- No (Gene/Plasmid/Buffer/Reagent/USA) --> OutEmpty["Set 'curated_antibiotic_review1' = NaN<br/>(Exclude non-drug items: QnrB69_1, IncFIB, PBS)"]:::alert
+    DecValid -- Yes --> StepStrip["Step 2: Strip General Words & Annotations<br/>• Remove trailing '(antibiotic)', '(disinfectant)'<br/>• Remove dosages & abbreviations: '(30 µg)', '(AK)'"]:::process
+
+    StepStrip --> DecCombo{"Is it a Combination Drug Therapy?<br/>(e.g., Amoxicillin-Clavulanate, Co-trimoxazole, Zosyn)"}:::decision
+
+    DecCombo -- Yes --> StdCombo["Step 3A: Combination Drug Alignment<br/>• Amoxicillin-Clavulanate → Amoxicillin/Clavulanic acid<br/>• Co-trimoxazole → Trimethoprim/Sulfamethoxazole<br/>• Piperacillin-tazobactam → Piperacillin/Tazobactam<br/>• Ceftazidime-avibactam → Ceftazidime/Avibactam"]:::process
+    DecCombo -- No --> DecMulti{"Does text contain multiple valid antibiotics?<br/>(e.g., ciprofloxacin, levofloxacin)"}:::decision
+
+    DecMulti -- Yes --> SplitMulti["Step 3B: Multi-Antibiotic List Processing<br/>• Split on commas, slashes, or 'and'<br/>• Standardize each drug token to Title Case<br/>• Deduplicate & rejoin with ', '"]:::process
+    DecMulti -- No --> DecSingle["Step 3C: Single Drug Canonical Normalization<br/>• Title Case casing: azithromycin → Azithromycin<br/>• Typos: Cefapime → Cefepime, Cefazidime → Ceftazidime<br/>• Synonyms: rifampin → Rifampicin, tylosine → Tylosin"]:::process
+
+    StdCombo --> OutReview["Populate 'curated_antibiotic_review1'"]:::success
+    SplitMulti --> OutReview
+    DecSingle --> OutReview
+
+    OutReview --> Validation["Step 4: Quality Gate & Validation<br/>• 1,367 valid recognized drug extractions<br/>• 874 non-drug reagent/gene/plasmid exclusions<br/>• 0 entries with trailing '(antibiotic)' or general text"]:::process
+    OutEmpty --> Validation
+
+    Validation --> Save["Step 5: Export & Save Excel Assets<br/>• CuratedAntibioticsDataReview/final_antibiotic_curated.xlsx<br/>• CuratedAntibioticsDataReview/final_antibiotics_curated.xlsx<br/>• final_antibiotics_curated.xlsx"]:::startEnd`,
+            "disease curation review": `graph TD
+    classDef startEnd fill:#1e293b,stroke:#0f172a,stroke-width:2px,color:#fff,font-weight:bold;
+    classDef process fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#1e3a8a;
+    classDef decision fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#78350f;
+    classDef success fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#064e3b;
+    classDef alert fill:#fff1f2,stroke:#f43f5e,stroke-width:2px,color:#881337;
+
+    Start(["Start: Raw Disease Dataset (1,475 Rows)"]):::startEnd --> Step1["Step 1: Load Text Entities<br/>('original_diseases' & 'curated_diseases')"]:::process
+
+    Step1 --> DecValid{"Is it a Valid Recognized Disease or Clinical Syndrome?<br/>(Check against MeSH / ICD-11 canonical dictionary)"}:::decision
+    DecValid -- No (Resistance Phenotype / AMR / Bacteria / Vague Text) --> OutEmpty["Set 'curated_disease_review1' = NaN<br/>(Exclude non-disease items: Antibiotic Resistance, AMR)"]:::alert
+    DecValid -- Yes --> StepAcronym["Step 2: Acronym & Synonym Expansion<br/>• UTI / UTIs → Urinary Tract Infection<br/>• TB / Pulmonary TB → Tuberculosis<br/>• BSI → Bloodstream Infection<br/>• SSTI → Skin and Soft Tissue Infection<br/>• VAP → Ventilator-Associated Pneumonia<br/>• CAUTI → Catheter-Associated Urinary Tract Infection"]:::process
+
+    StepAcronym --> DecMulti{"Does text contain multiple diseases?<br/>(e.g., urinary tract infection, pneumonia, sepsis)"}:::decision
+
+    DecMulti -- Yes --> SplitMulti["Step 3A: Multi-Disease List Processing<br/>• Split on commas or 'and'<br/>• Standardize each disease token to Title Case<br/>• Deduplicate & rejoin with ', '"]:::process
+    DecMulti -- No --> DecSingle["Step 3B: Single Disease Canonical Normalization<br/>• Diarrhoeal disease → Diarrhea<br/>• Acute gastroenteritis → Gastroenteritis<br/>• Bovine mastitis → Mastitis<br/>• Septicemia → Sepsis"]:::process
+
+    SplitMulti --> OutReview["Populate 'curated_disease_review1'"]:::success
+    DecSingle --> OutReview
+
+    OutReview --> Validation["Step 4: Quality Gate & Validation<br/>• 1,053 valid recognized disease extractions<br/>• 422 non-disease resistance phenotype exclusions<br/>• 100% Title Case & expanded clinical acronyms"]:::process
+    OutEmpty --> Validation
+
+    Validation --> Save["Step 5: Export & Save Excel Assets<br/>• CuratedDiseasesDataReview/final_disease_curated.xlsx<br/>• CuratedDiseasesDataReview/final_diseases_curated.xlsx<br/>• final_diseases_curated.xlsx"]:::startEnd`,
+            "gene curation review": `graph TD
+    classDef startEnd fill:#1e293b,stroke:#0f172a,stroke-width:2px,color:#fff,font-weight:bold;
+    classDef process fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#1e3a8a;
+    classDef decision fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#78350f;
+    classDef success fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#064e3b;
+    classDef alert fill:#fff1f2,stroke:#f43f5e,stroke-width:2px,color:#881337;
+
+    Start(["Start: Raw Dataset (3,674 Rows)"]):::startEnd --> Step1["Step 1: Strip 'P-' Prefixes<br/>(e.g., P-QnrB → QnrB)"]:::process
+
+    Step1 --> Step2["Step 2: Inspect Row Text<br/>('original_genes' & 'curated_genes')"]:::process
+
+    Step2 --> DecHuman{"Is it a Human Host Gene?<br/>(e.g., HERG, hMLH1, HNF1α)"}:::decision
+    DecHuman -- Yes --> OutEmpty["Set 'curated_gene_review1' = NaN<br/>(Exclude Human Host Factors)"]:::alert
+    DecHuman -- No --> DecGeneric{"Is it a Pure Number Count<br/>or Generic Text Phrase?<br/>(e.g., 2934 predicted genes, ARGs)"}:::decision
+
+    DecGeneric -- Pure Count / Generic --> CheckRNA{"Does text contain specific RNA/Gene?<br/>(e.g., tRNA, 16S rRNA)"}:::decision
+    CheckRNA -- Yes --> OutRNA["Extract RNA/Gene category<br/>(e.g., tRNA)"]:::success
+    CheckRNA -- No --> OutEmpty
+
+    DecGeneric -- Specific Gene Mention --> DecTrunc{"Is 'curated_genes' Truncated<br/>or Malformed?<br/>(e.g., aac(6, H-2, 10, unclosed parens)"}:::decision
+
+    DecTrunc -- Yes --> RepairPattern["Step 3A: Truncation Repair & Full Extraction<br/>• Reconstruct full symbols from 'original_genes'<br/>• Fix prime symbols: aac(6')-Ib-cr<br/>• Preserve hyphens: IMP-10, MSH-2<br/>• Expand variants: blaOXA-2, blaOXA-10"]:::process
+    DecTrunc -- No --> DecMulti{"Does 'original_genes' contain<br/>multiple genes / list?"}:::decision
+
+    DecMulti -- Yes --> ExtractMulti["Step 3B: Multi-Gene List Processing<br/>• Extract all valid ARG/microbial gene tokens<br/>• Exclude stop words & generic terms<br/>• Deduplicate & format as comma-separated string"]:::process
+    DecMulti -- No --> ExtractSingle["Step 3C: Single Gene Clean Normalization<br/>• Retain clean single gene symbol"]:::process
+
+    RepairPattern --> NumericCheck{"Contains Standalone Numbers?<br/>(e.g., pure digits '2934', '14')"}:::decision
+    ExtractMulti --> NumericCheck
+    ExtractSingle --> NumericCheck
+
+    NumericCheck -- Yes --> FilterNum["Filter Out Standalone Digits<br/>(Keep complete gene names)"]:::alert
+    NumericCheck -- No --> OutReview["Populate 'curated_gene_review1'"]:::success
+    FilterNum --> OutReview
+
+    OutReview --> Validation["Step 4: Quality Gate & Validation<br/>• 0 standalone numeric tokens remaining<br/>• 3,621 valid non-human gene extractions<br/>• 53 human/generic exclusions"]:::process
+    OutEmpty --> Validation
+
+    Validation --> Save["Step 5: Export & Save Excel Assets<br/>• CuratedDataReview/final_gene_curated.xlsx<br/>• CuratedDataReview/final_genes_curated.xlsx<br/>• final_genes_curated.xlsx"]:::startEnd`,
+            "pathogen curation review": `graph TD
+    classDef startEnd fill:#1e293b,stroke:#0f172a,stroke-width:2px,color:#fff,font-weight:bold;
+    classDef process fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#1e3a8a;
+    classDef decision fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#78350f;
+    classDef success fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#064e3b;
+    classDef alert fill:#fff1f2,stroke:#f43f5e,stroke-width:2px,color:#881337;
+
+    Start(["Start: Raw Pathogen Dataset (1,346 Rows)"]):::startEnd --> Step1["Step 1: Load Text Entities<br/>('original_pathogens' & 'curated_pathogens')"]:::process
+
+    Step1 --> DecValid{"Is it a Valid Recognized Pathogen Species or Genus?<br/>(Check Linnaean binomial taxonomy)"}:::decision
+    DecValid -- No (Resistance Mechanism / AMR / Host Source / Vague Text) --> OutEmpty["Set 'curated_pathogen_review1' = NaN<br/>(Exclude non-pathogen items: MRSA, CRE, antibiotic-resistant bacteria)"]:::alert
+    DecValid -- Yes --> StepLinnaean["Step 2: Binomial Linnaean Normalization<br/>• E. coli → Escherichia coli<br/>• K. pneumoniae → Klebsiella pneumoniae<br/>• P. aeruginosa → Pseudomonas aeruginosa<br/>• CAMPYLOBACTER JEUNI → Campylobacter jejuni<br/>• Salmonella Typhi → Salmonella enterica serovar Typhi"]:::process
+
+    StepLinnaean --> DecMulti{"Does text contain multiple pathogens?<br/>(e.g., E. coli, K. pneumoniae, P. aeruginosa)"}:::decision
+
+    DecMulti -- Yes --> SplitMulti["Step 3A: Multi-Pathogen List Processing<br/>• Split on commas or 'and'<br/>• Standardize each species token to Binomial Case<br/>• Deduplicate & rejoin with ', '"]:::process
+    DecMulti -- No --> DecSingle["Step 3B: Single Pathogen Canonical Normalization<br/>• Standardize Genus species binomial formatting<br/>• Fix taxonomic typos (e.g. Escherichia faecalis → Enterococcus faecalis)<br/>• Standardize viral names (e.g. HIV → Human Immunodeficiency Virus)"]:::process
+
+    SplitMulti --> OutReview["Populate 'curated_pathogen_review1'"]:::success
+    DecSingle --> OutReview
+
+    OutReview --> Validation["Step 4: Quality Gate & Validation<br/>• 1,048 valid recognized pathogen extractions<br/>• 298 non-pathogen resistance mechanism/host exclusions<br/>• 100% Linnaean binomial formatting (Genus species)"]:::process
+    OutEmpty --> Validation
+
+    Validation --> Save["Step 5: Export & Save Excel Assets<br/>• CuratedPathogensDataReview/final_pathogen_curated.xlsx<br/>• CuratedPathogensDataReview/final_pathogens_curated.xlsx<br/>• final_pathogens_curated.xlsx"]:::startEnd`
+        };
+
         function showMermaidModal(flowName) {
             const modal = document.getElementById('mermaid-modal');
             const container = document.getElementById('mermaid-container');
@@ -3767,38 +4037,46 @@
             container.innerHTML = '<div class="flex items-center justify-center h-64"><i class="fa-solid fa-circle-notch animate-spin text-2xl text-indigo-600"></i></div>';
             modal.classList.remove('hidden');
 
-            const filePath = `viewdata/flowcharts/${flowName}.mmd`;
+            const encodedName = encodeURIComponent(flowName);
+            const filePath = `viewdata/flowcharts/${encodedName}.mmd`;
+
+            const renderMermaid = async (text) => {
+                container.innerHTML = `<div class="mermaid w-full h-full">${text}</div>`;
+                await mermaid.run({
+                    nodes: [container.querySelector('.mermaid')]
+                });
+
+                const svg = container.querySelector('svg');
+                if (svg) {
+                    svg.removeAttribute('height');
+                    svg.style.width = '100%';
+                    svg.style.height = '100%';
+                    svg.style.maxWidth = 'none';
+
+                    panZoomInstance = svgPanZoom(svg, {
+                        zoomEnabled: true,
+                        controlIconsEnabled: true,
+                        fit: true,
+                        center: true,
+                        minZoom: 0.1,
+                        maxZoom: 10
+                    });
+                }
+            };
 
             fetch(filePath)
                 .then(response => {
                     if (!response.ok) throw new Error(`Could not load flowchart file: ${response.status}`);
                     return response.text();
                 })
-                .then(async (text) => {
-                    container.innerHTML = `<div class="mermaid w-full h-full">${text}</div>`;
-                    await mermaid.run({
-                        nodes: [container.querySelector('.mermaid')]
-                    });
-
-                    const svg = container.querySelector('svg');
-                    if (svg) {
-                        svg.removeAttribute('height');
-                        svg.style.width = '100%';
-                        svg.style.height = '100%';
-                        svg.style.maxWidth = 'none';
-
-                        panZoomInstance = svgPanZoom(svg, {
-                            zoomEnabled: true,
-                            controlIconsEnabled: true,
-                            fit: true,
-                            center: true,
-                            minZoom: 0.1,
-                            maxZoom: 10
-                        });
-                    }
-                })
+                .then(text => renderMermaid(text))
                 .catch(err => {
-                    container.innerHTML = `<div class="text-rose-500 text-xs font-bold p-8 text-center bg-rose-50 rounded-xl border border-rose-100"><i class="fa-solid fa-circle-exclamation text-2xl mb-2 block"></i> Error loading flowchart:<br/>${err.message}</div>`;
+                    const cleanName = flowName.trim().toLowerCase();
+                    if (EMBEDDED_FLOWCHARTS[cleanName]) {
+                        renderMermaid(EMBEDDED_FLOWCHARTS[cleanName]);
+                    } else {
+                        container.innerHTML = `<div class="text-rose-500 text-xs font-bold p-8 text-center bg-rose-50 rounded-xl border border-rose-100"><i class="fa-solid fa-circle-exclamation text-2xl mb-2 block"></i> Error loading flowchart:<br/>${err.message}</div>`;
+                    }
                 });
         }
 
